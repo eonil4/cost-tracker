@@ -7,13 +7,28 @@ interface ExpenseProviderProps {
 }
 
 export const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
+  // Load persisted expenses safely and defensively
   const [expenses, setExpenses] = useState<Expense[]>(() => {
-    const savedExpenses = localStorage.getItem("expenses");
-    return savedExpenses ? JSON.parse(savedExpenses) : [];
+    try {
+      if (typeof window === "undefined") return [];
+      const savedExpenses = window.localStorage.getItem("expenses");
+      if (!savedExpenses) return [];
+      const parsed = JSON.parse(savedExpenses);
+      return Array.isArray(parsed) ? (parsed as Expense[]) : [];
+    } catch {
+      // Corrupted or inaccessible storage; start fresh
+      return [];
+    }
   });
 
   useEffect(() => {
-    localStorage.setItem("expenses", JSON.stringify(expenses));
+    try {
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("expenses", JSON.stringify(expenses));
+      }
+    } catch {
+      // Ignore storage write failures
+    }
   }, [expenses]);
 
   const addExpense = (expense: Expense) => {

@@ -70,10 +70,18 @@ const ExpenseForm: React.FC = () => {
       <Box display="flex" flexDirection="column" gap={2}>
         {/* Autocomplete for Description */}
         <Autocomplete
-          options={uniqueDescriptions} // Options for autocomplete
-          freeSolo // Allow custom input
-          value={description} // Bind to description state
-          onInputChange={(_, newInputValue) => setDescription(newInputValue)} // Update description on input change
+          options={uniqueDescriptions}
+          freeSolo
+          inputValue={description}
+          onInputChange={(_, newInputValue) => setDescription(newInputValue)}
+          // Ensure selected option also updates input when user picks from list
+          onChange={(_, newValue) => {
+            if (typeof newValue === "string") {
+              setDescription(newValue);
+            } else if (newValue != null) {
+              setDescription(String(newValue));
+            }
+          }}
           renderInput={(params) => (
             <TextField {...params} label="Description" variant="outlined" fullWidth />
           )}
