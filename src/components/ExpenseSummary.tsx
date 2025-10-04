@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { ExpenseContext } from "../context/ExpenseContext";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import type { Expense } from "../types";
 import {
   format,
   isWithinInterval,
