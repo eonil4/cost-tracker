@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useCallback, useMemo } from "react";
 import { ExpenseContext } from "../context/ExpenseContext";
 import {
   TextField,
@@ -40,17 +40,17 @@ const ExpenseForm: React.FC = () => {
   const [showError, setShowError] = useState<boolean>(false); // State for showing error snackbar
 
   // Generate unique ID using crypto.randomUUID or fallback to timestamp + random
-  const generateUniqueId = (): number => {
+  const generateUniqueId = useCallback((): number => {
     if (typeof crypto !== 'undefined' && crypto.randomUUID) {
       // Use crypto.randomUUID for better uniqueness
       return parseInt(crypto.randomUUID().replace(/\D/g, '').slice(0, 13), 10);
     }
     // Fallback: timestamp + random number to reduce collision risk
     return Date.now() + Math.floor(Math.random() * 1000);
-  };
+  }, []);
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate form inputs
@@ -91,11 +91,12 @@ const ExpenseForm: React.FC = () => {
     setAmount("");
     setDate(getTodayDate()); // Reset date to today
     setCurrency("HUF");
-  };
+  }, [description, amount, date, currency, validCurrencies, addExpense, generateUniqueId]);
 
   // Extract unique descriptions from previous expenses
-  const uniqueDescriptions = Array.from(
-    new Set(expenses.map((expense) => expense.description))
+  const uniqueDescriptions = useMemo(() => 
+    Array.from(new Set(expenses.map((expense) => expense.description))),
+    [expenses]
   );
 
   return (

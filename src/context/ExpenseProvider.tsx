@@ -1,4 +1,4 @@
-import React, { useState, useEffect, type ReactNode } from "react";
+import React, { useState, useEffect, useCallback, type ReactNode } from "react";
 import { ExpenseContext } from "./ExpenseContext";
 import type { Expense } from "../types";
 
@@ -44,7 +44,7 @@ export const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) =>
     }
   }, [expenses]);
 
-  const addExpense = (expense: Expense) => {
+  const addExpense = useCallback((expense: Expense) => {
     // Validate expense data before adding
     if (!expense || 
         typeof expense.id !== 'number' || 
@@ -59,11 +59,11 @@ export const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) =>
     }
     
     setExpenses((prevExpenses) => [...prevExpenses, expense]);
-  };
+  }, []);
 
-  const deleteExpense = (id: number) => {
+  const deleteExpense = useCallback((id: number) => {
     setExpenses((prevExpenses) => prevExpenses.filter((expense) => expense.id !== id));
-  };
+  }, []);
 
   return (
     <ExpenseContext.Provider value={{ expenses, addExpense, deleteExpense }}>

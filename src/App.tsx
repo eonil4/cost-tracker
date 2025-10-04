@@ -1,9 +1,11 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { ExpenseProvider } from "./context/ExpenseProvider";
 import ExpenseForm from "./components/ExpenseForm";
 import ExpenseList from "./components/ExpenseList";
-import ExpenseSummary from "./components/ExpenseSummary";
-import { Container, Typography, Paper } from "@mui/material";
+import { Container, Typography, Paper, CircularProgress, Box } from "@mui/material";
+
+// Lazy load the heavy ExpenseSummary component
+const ExpenseSummary = lazy(() => import("./components/ExpenseSummary"));
 
 const App: React.FC = () => {
   return (
@@ -15,7 +17,13 @@ const App: React.FC = () => {
           </Typography>
           <ExpenseForm />
           <ExpenseList />
-          <ExpenseSummary />
+          <Suspense fallback={
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+              <CircularProgress />
+            </Box>
+          }>
+            <ExpenseSummary />
+          </Suspense>
         </Paper>
       </Container>
     </ExpenseProvider>

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useMemo, useCallback } from "react";
 import { ExpenseContext } from "../context/ExpenseContext";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import type { Expense } from "../types";
@@ -27,7 +27,7 @@ const ExpenseSummary: React.FC = () => {
   const { expenses } = context;
 
   // Helper function to parse a date string into a Date object
-  const parseDate = (dateString: string): Date => {
+  const parseDate = useCallback((dateString: string): Date => {
     const date = new Date(dateString);
     // Check if the date is valid
     if (isNaN(date.getTime())) {
@@ -35,85 +35,100 @@ const ExpenseSummary: React.FC = () => {
       return new Date(); // Return current date as fallback
     }
     return date;
-  };
+  }, []);
 
-  // Get today's date
-  const today = new Date();
+  // Memoize expensive calculations
+  const summaryData = useMemo(() => {
+    const today = new Date();
 
-  // === DAILY COSTS (CURRENT WEEK) ===
-  const weekStart = startOfWeek(today, { weekStartsOn: 1 }); // Week starts on Monday
-  const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
-  const expensesInCurrentWeek = expenses.filter((expense) =>
-    isWithinInterval(parseDate(expense.date), { start: weekStart, end: weekEnd })
-  );
+    // === DAILY COSTS (CURRENT WEEK) ===
+    const weekStart = startOfWeek(today, { weekStartsOn: 1 }); // Week starts on Monday
+    const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
+    const expensesInCurrentWeek = expenses.filter((expense) =>
+      isWithinInterval(parseDate(expense.date), { start: weekStart, end: weekEnd })
+    );
 
-  const dailyCosts = expensesInCurrentWeek.reduce((acc, expense) => {
-    const day = format(parseDate(expense.date), "yyyy-MM-dd"); // Group by day
-    acc[day] = (acc[day] || 0) + expense.amount;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const dailyData = Object.entries(dailyCosts).map(([day, total]) => ({
-    name: day,
-    value: total,
-  }));
-
-  const weeklySummary = Object.values(dailyCosts).reduce((sum, value) => sum + value, 0);
-  
-  // Get the most common currency for display
-  const getMostCommonCurrency = (expenses: Expense[]): string => {
-    if (expenses.length === 0) return "HUF";
-    const currencyCount = expenses.reduce((acc, expense) => {
-      acc[expense.currency] = (acc[expense.currency] || 0) + 1;
+    const dailyCosts = expensesInCurrentWeek.reduce((acc, expense) => {
+      const day = format(parseDate(expense.date), "yyyy-MM-dd"); // Group by day
+      acc[day] = (acc[day] || 0) + expense.amount;
       return acc;
     }, {} as Record<string, number>);
-    const currencies = Object.entries(currencyCount);
-    if (currencies.length === 0) return "HUF";
-    return currencies.reduce((a, b) => currencyCount[a[0]] > currencyCount[b[0]] ? a : b)[0];
-  };
 
-  // === WEEKLY COSTS (CURRENT MONTH) ===
-  const monthStart = startOfMonth(today);
-  const monthEnd = endOfMonth(today);
-  const expensesInCurrentMonth = expenses.filter((expense) =>
-    isWithinInterval(parseDate(expense.date), { start: monthStart, end: monthEnd })
-  );
+    const dailyData = Object.entries(dailyCosts).map(([day, total]) => ({
+      name: day,
+      value: total,
+    }));
 
-  const weeklyCosts = expensesInCurrentMonth.reduce((acc, expense) => {
-    const expenseDate = parseDate(expense.date);
-    const weekStart = startOfWeek(expenseDate, { weekStartsOn: 1 }); // Week starts on Monday
-    const weekEnd = endOfWeek(expenseDate, { weekStartsOn: 1 });
-    const weekKey = `${format(weekStart, "yyyy-MM-dd")} - ${format(weekEnd, "yyyy-MM-dd")}`; // Group by week
-    acc[weekKey] = (acc[weekKey] || 0) + expense.amount;
-    return acc;
-  }, {} as Record<string, number>);
+    const weeklySummary = Object.values(dailyCosts).reduce((sum, value) => sum + value, 0);
 
-  const weeklyData = Object.entries(weeklyCosts).map(([week, total]) => ({
-    name: week,
-    value: total,
-  }));
+    // Get the most common currency for display
+    const getMostCommonCurrency = (expenses: Expense[]): string => {
+      if (expenses.length === 0) return "HUF";
+      const currencyCount = expenses.reduce((acc, expense) => {
+        acc[expense.currency] = (acc[expense.currency] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      const currencies = Object.entries(currencyCount);
+      if (currencies.length === 0) return "HUF";
+      return currencies.reduce((a, b) => currencyCount[a[0]] > currencyCount[b[0]] ? a : b)[0];
+    };
 
-  const monthlySummary = Object.values(weeklyCosts).reduce((sum, value) => sum + value, 0);
+    // === WEEKLY COSTS (CURRENT MONTH) ===
+    const monthStart = startOfMonth(today);
+    const monthEnd = endOfMonth(today);
+    const expensesInCurrentMonth = expenses.filter((expense) =>
+      isWithinInterval(parseDate(expense.date), { start: monthStart, end: monthEnd })
+    );
 
-  // === MONTHLY COSTS (CURRENT YEAR) ===
-  const yearStart = startOfYear(today);
-  const yearEnd = endOfYear(today);
-  const expensesInCurrentYear = expenses.filter((expense) =>
-    isWithinInterval(parseDate(expense.date), { start: yearStart, end: yearEnd })
-  );
+    const weeklyCosts = expensesInCurrentMonth.reduce((acc, expense) => {
+      const expenseDate = parseDate(expense.date);
+      const weekStart = startOfWeek(expenseDate, { weekStartsOn: 1 }); // Week starts on Monday
+      const weekEnd = endOfWeek(expenseDate, { weekStartsOn: 1 });
+      const weekKey = `${format(weekStart, "yyyy-MM-dd")} - ${format(weekEnd, "yyyy-MM-dd")}`; // Group by week
+      acc[weekKey] = (acc[weekKey] || 0) + expense.amount;
+      return acc;
+    }, {} as Record<string, number>);
 
-  const monthlyCosts = expensesInCurrentYear.reduce((acc, expense) => {
-    const month = format(parseDate(expense.date), "MMMM"); // Group by month name
-    acc[month] = (acc[month] || 0) + expense.amount;
-    return acc;
-  }, {} as Record<string, number>);
+    const weeklyData = Object.entries(weeklyCosts).map(([week, total]) => ({
+      name: week,
+      value: total,
+    }));
 
-  const monthlyData = Object.entries(monthlyCosts).map(([month, total]) => ({
-    name: month,
-    value: total,
-  }));
+    const monthlySummary = Object.values(weeklyCosts).reduce((sum, value) => sum + value, 0);
 
-  const yearlySummary = Object.values(monthlyCosts).reduce((sum, value) => sum + value, 0);
+    // === MONTHLY COSTS (CURRENT YEAR) ===
+    const yearStart = startOfYear(today);
+    const yearEnd = endOfYear(today);
+    const expensesInCurrentYear = expenses.filter((expense) =>
+      isWithinInterval(parseDate(expense.date), { start: yearStart, end: yearEnd })
+    );
+
+    const monthlyCosts = expensesInCurrentYear.reduce((acc, expense) => {
+      const month = format(parseDate(expense.date), "MMMM"); // Group by month name
+      acc[month] = (acc[month] || 0) + expense.amount;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const monthlyData = Object.entries(monthlyCosts).map(([month, total]) => ({
+      name: month,
+      value: total,
+    }));
+
+    const yearlySummary = Object.values(monthlyCosts).reduce((sum, value) => sum + value, 0);
+
+    return {
+      dailyData,
+      weeklySummary,
+      expensesInCurrentWeek,
+      weeklyData,
+      monthlySummary,
+      expensesInCurrentMonth,
+      monthlyData,
+      yearlySummary,
+      expensesInCurrentYear,
+      getMostCommonCurrency
+    };
+  }, [expenses, parseDate]);
 
   return (
     <Box>
@@ -125,7 +140,7 @@ const ExpenseSummary: React.FC = () => {
         <ResponsiveContainer>
           <PieChart>
             <Pie
-              data={dailyData}
+              data={summaryData.dailyData}
               dataKey="value"
               nameKey="name"
               cx="50%"
@@ -134,7 +149,7 @@ const ExpenseSummary: React.FC = () => {
               fill="#8884d8"
               label
             >
-              {dailyData.map((_, index) => (
+              {summaryData.dailyData.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
@@ -144,7 +159,7 @@ const ExpenseSummary: React.FC = () => {
         </ResponsiveContainer>
       </Box>
       <Typography align="center" variant="subtitle1">
-        Weekly Total: {weeklySummary.toFixed(2)} {getMostCommonCurrency(expensesInCurrentWeek)}
+        Weekly Total: {summaryData.weeklySummary.toFixed(2)} {summaryData.getMostCommonCurrency(summaryData.expensesInCurrentWeek)}
       </Typography>
       <Divider style={{ margin: "1rem 0" }} />
 
@@ -156,7 +171,7 @@ const ExpenseSummary: React.FC = () => {
         <ResponsiveContainer>
           <PieChart>
             <Pie
-              data={weeklyData}
+              data={summaryData.weeklyData}
               dataKey="value"
               nameKey="name"
               cx="50%"
@@ -165,7 +180,7 @@ const ExpenseSummary: React.FC = () => {
               fill="#82ca9d"
               label
             >
-              {weeklyData.map((_, index) => (
+              {summaryData.weeklyData.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
@@ -175,7 +190,7 @@ const ExpenseSummary: React.FC = () => {
         </ResponsiveContainer>
       </Box>
       <Typography align="center" variant="subtitle1">
-        Monthly Total: {monthlySummary.toFixed(2)} {getMostCommonCurrency(expensesInCurrentMonth)}
+        Monthly Total: {summaryData.monthlySummary.toFixed(2)} {summaryData.getMostCommonCurrency(summaryData.expensesInCurrentMonth)}
       </Typography>
       <Divider style={{ margin: "1rem 0" }} />
 
@@ -187,7 +202,7 @@ const ExpenseSummary: React.FC = () => {
         <ResponsiveContainer>
           <PieChart>
             <Pie
-              data={monthlyData}
+              data={summaryData.monthlyData}
               dataKey="value"
               nameKey="name"
               cx="50%"
@@ -196,7 +211,7 @@ const ExpenseSummary: React.FC = () => {
               fill="#FF8042"
               label
             >
-              {monthlyData.map((_, index) => (
+              {summaryData.monthlyData.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
@@ -206,7 +221,7 @@ const ExpenseSummary: React.FC = () => {
         </ResponsiveContainer>
       </Box>
       <Typography align="center" variant="subtitle1">
-        Yearly Total: {yearlySummary.toFixed(2)} {getMostCommonCurrency(expensesInCurrentYear)}
+        Yearly Total: {summaryData.yearlySummary.toFixed(2)} {summaryData.getMostCommonCurrency(summaryData.expensesInCurrentYear)}
       </Typography>
     </Box>
   );
