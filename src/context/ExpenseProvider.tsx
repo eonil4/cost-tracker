@@ -7,6 +7,7 @@ interface ExpenseProviderProps {
 }
 
 export const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
+  // Load persisted expenses safely and defensively
   const [expenses, setExpenses] = useState<Expense[]>(() => {
     try {
       const savedExpenses = localStorage.getItem("expenses");
