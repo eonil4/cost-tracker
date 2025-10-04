@@ -26,7 +26,15 @@ const ExpenseSummary: React.FC = () => {
   const { expenses } = context;
 
   // Helper function to parse a date string into a Date object
-  const parseDate = (dateString: string): Date => new Date(dateString);
+  const parseDate = (dateString: string): Date => {
+    const date = new Date(dateString);
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      console.warn(`Invalid date string: ${dateString}`);
+      return new Date(); // Return current date as fallback
+    }
+    return date;
+  };
 
   // Get today's date
   const today = new Date();
@@ -50,6 +58,18 @@ const ExpenseSummary: React.FC = () => {
   }));
 
   const weeklySummary = Object.values(dailyCosts).reduce((sum, value) => sum + value, 0);
+  
+  // Get the most common currency for display
+  const getMostCommonCurrency = (expenses: Expense[]): string => {
+    if (expenses.length === 0) return "HUF";
+    const currencyCount = expenses.reduce((acc, expense) => {
+      acc[expense.currency] = (acc[expense.currency] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    const currencies = Object.entries(currencyCount);
+    if (currencies.length === 0) return "HUF";
+    return currencies.reduce((a, b) => currencyCount[a[0]] > currencyCount[b[0]] ? a : b)[0];
+  };
 
   // === WEEKLY COSTS (CURRENT MONTH) ===
   const monthStart = startOfMonth(today);
@@ -123,7 +143,7 @@ const ExpenseSummary: React.FC = () => {
         </ResponsiveContainer>
       </Box>
       <Typography align="center" variant="subtitle1">
-        Weekly Total: {weeklySummary.toFixed(2)} HUF
+        Weekly Total: {weeklySummary.toFixed(2)} {getMostCommonCurrency(expensesInCurrentWeek)}
       </Typography>
       <Divider style={{ margin: "1rem 0" }} />
 
@@ -154,7 +174,7 @@ const ExpenseSummary: React.FC = () => {
         </ResponsiveContainer>
       </Box>
       <Typography align="center" variant="subtitle1">
-        Monthly Total: {monthlySummary.toFixed(2)} HUF
+        Monthly Total: {monthlySummary.toFixed(2)} {getMostCommonCurrency(expensesInCurrentMonth)}
       </Typography>
       <Divider style={{ margin: "1rem 0" }} />
 
@@ -185,7 +205,7 @@ const ExpenseSummary: React.FC = () => {
         </ResponsiveContainer>
       </Box>
       <Typography align="center" variant="subtitle1">
-        Yearly Total: {yearlySummary.toFixed(2)} HUF
+        Yearly Total: {yearlySummary.toFixed(2)} {getMostCommonCurrency(expensesInCurrentYear)}
       </Typography>
     </Box>
   );

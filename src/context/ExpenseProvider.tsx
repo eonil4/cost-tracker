@@ -8,12 +8,30 @@ interface ExpenseProviderProps {
 
 export const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
   const [expenses, setExpenses] = useState<Expense[]>(() => {
-    const savedExpenses = localStorage.getItem("expenses");
-    return savedExpenses ? JSON.parse(savedExpenses) : [];
+    try {
+      const savedExpenses = localStorage.getItem("expenses");
+      if (savedExpenses) {
+        const parsed = JSON.parse(savedExpenses);
+        // Validate that parsed data is an array
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      }
+      return [];
+    } catch (error) {
+      console.error("Error parsing expenses from localStorage:", error);
+      // Clear corrupted data
+      localStorage.removeItem("expenses");
+      return [];
+    }
   });
 
   useEffect(() => {
-    localStorage.setItem("expenses", JSON.stringify(expenses));
+    try {
+      localStorage.setItem("expenses", JSON.stringify(expenses));
+    } catch (error) {
+      console.error("Error saving expenses to localStorage:", error);
+    }
   }, [expenses]);
 
   const addExpense = (expense: Expense) => {

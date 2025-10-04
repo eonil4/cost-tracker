@@ -9,6 +9,8 @@ import {
   InputLabel,
   FormControl,
   Autocomplete,
+  Alert,
+  Snackbar,
 } from "@mui/material";
 
 const ExpenseForm: React.FC = () => {
@@ -26,26 +28,57 @@ const ExpenseForm: React.FC = () => {
     return `${year}-${month}-${day}`;
   };
 
+  // Valid currencies
+  const validCurrencies = ["HUF", "USD", "EUR", "GBP"];
+
   // Form state
   const [description, setDescription] = useState<string>(""); // State for description
   const [amount, setAmount] = useState<string>(""); // State for amount
   const [date, setDate] = useState<string>(getTodayDate()); // Default date is today
   const [currency, setCurrency] = useState<string>("HUF"); // Default currency
+  const [errorMessage, setErrorMessage] = useState<string>(""); // State for error messages
+  const [showError, setShowError] = useState<boolean>(false); // State for showing error snackbar
+
+  // Generate unique ID using crypto.randomUUID or fallback to timestamp + random
+  const generateUniqueId = (): number => {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      // Use crypto.randomUUID for better uniqueness
+      return parseInt(crypto.randomUUID().replace(/\D/g, '').slice(0, 13), 10);
+    }
+    // Fallback: timestamp + random number to reduce collision risk
+    return Date.now() + Math.floor(Math.random() * 1000);
+  };
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate form inputs
-    if (!description || !amount || !date || !currency) {
-      alert("Please fill in all fields.");
+    if (!description.trim() || !amount || !date || !currency) {
+      setErrorMessage("Please fill in all fields.");
+      setShowError(true);
+      return;
+    }
+
+    // Validate currency
+    if (!validCurrencies.includes(currency)) {
+      setErrorMessage("Please select a valid currency.");
+      setShowError(true);
+      return;
+    }
+
+    // Validate amount is a positive number
+    const parsedAmount = parseFloat(amount);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      setErrorMessage("Please enter a valid positive amount.");
+      setShowError(true);
       return;
     }
 
     const newExpense = {
-      id: Date.now(),
-      description,
-      amount: parseFloat(amount),
+      id: generateUniqueId(),
+      description: description.trim(),
+      amount: parsedAmount,
       date,
       currency,
     };
@@ -104,12 +137,12 @@ const ExpenseForm: React.FC = () => {
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
             label="Currency"
-            readOnly
           >
-            <MenuItem value="HUF">HUF</MenuItem>
-            <MenuItem value="USD">USD</MenuItem>
-            <MenuItem value="EUR">EUR</MenuItem>
-            <MenuItem value="GBP">GBP</MenuItem>
+            {validCurrencies.map((curr) => (
+              <MenuItem key={curr} value={curr}>
+                {curr}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
         {/* Submit Button */}
@@ -123,6 +156,18 @@ const ExpenseForm: React.FC = () => {
           Add Expense
         </Button>
       </Box>
+      
+      {/* Error Snackbar */}
+      <Snackbar
+        open={showError}
+        autoHideDuration={6000}
+        onClose={() => setShowError(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setShowError(false)} severity="error" sx={{ width: '100%' }}>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
     </form>
   );
 };
