@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { ExpenseContext } from "../context/ExpenseContext";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import {
@@ -25,8 +25,16 @@ const ExpenseSummary: React.FC = () => {
 
   const { expenses } = context;
 
-  // Helper function to parse a date string into a Date object
-  const parseDate = (dateString: string): Date => new Date(dateString);
+  // Helper to parse yyyy-MM-dd as local date to avoid timezone skew
+  const parseLocalDate = (dateString: string): Date => {
+    // Expect format yyyy-MM-dd
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
+    if (!match) return new Date(dateString);
+    const year = Number(match[1]);
+    const monthIndex = Number(match[2]) - 1; // 0-based
+    const day = Number(match[3]);
+    return new Date(year, monthIndex, day);
+  };
 
   // Get today's date
   const today = new Date();
@@ -34,12 +42,14 @@ const ExpenseSummary: React.FC = () => {
   // === DAILY COSTS (CURRENT WEEK) ===
   const weekStart = startOfWeek(today, { weekStartsOn: 1 }); // Week starts on Monday
   const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
-  const expensesInCurrentWeek = expenses.filter((expense) =>
-    isWithinInterval(parseDate(expense.date), { start: weekStart, end: weekEnd })
-  );
+  const expensesInCurrentWeek = useMemo(() =>
+    expenses.filter((expense) =>
+      isWithinInterval(parseLocalDate(expense.date), { start: weekStart, end: weekEnd })
+    )
+  , [expenses, weekStart, weekEnd]);
 
   const dailyCosts = expensesInCurrentWeek.reduce((acc, expense) => {
-    const day = format(parseDate(expense.date), "yyyy-MM-dd"); // Group by day
+    const day = format(parseLocalDate(expense.date), "yyyy-MM-dd");
     acc[day] = (acc[day] || 0) + expense.amount;
     return acc;
   }, {} as Record<string, number>);
@@ -54,12 +64,14 @@ const ExpenseSummary: React.FC = () => {
   // === WEEKLY COSTS (CURRENT MONTH) ===
   const monthStart = startOfMonth(today);
   const monthEnd = endOfMonth(today);
-  const expensesInCurrentMonth = expenses.filter((expense) =>
-    isWithinInterval(parseDate(expense.date), { start: monthStart, end: monthEnd })
-  );
+  const expensesInCurrentMonth = useMemo(() =>
+    expenses.filter((expense) =>
+      isWithinInterval(parseLocalDate(expense.date), { start: monthStart, end: monthEnd })
+    )
+  , [expenses, monthStart, monthEnd]);
 
   const weeklyCosts = expensesInCurrentMonth.reduce((acc, expense) => {
-    const expenseDate = parseDate(expense.date);
+    const expenseDate = parseLocalDate(expense.date);
     const weekStart = startOfWeek(expenseDate, { weekStartsOn: 1 }); // Week starts on Monday
     const weekEnd = endOfWeek(expenseDate, { weekStartsOn: 1 });
     const weekKey = `${format(weekStart, "yyyy-MM-dd")} - ${format(weekEnd, "yyyy-MM-dd")}`; // Group by week
@@ -77,12 +89,14 @@ const ExpenseSummary: React.FC = () => {
   // === MONTHLY COSTS (CURRENT YEAR) ===
   const yearStart = startOfYear(today);
   const yearEnd = endOfYear(today);
-  const expensesInCurrentYear = expenses.filter((expense) =>
-    isWithinInterval(parseDate(expense.date), { start: yearStart, end: yearEnd })
-  );
+  const expensesInCurrentYear = useMemo(() =>
+    expenses.filter((expense) =>
+      isWithinInterval(parseLocalDate(expense.date), { start: yearStart, end: yearEnd })
+    )
+  , [expenses, yearStart, yearEnd]);
 
   const monthlyCosts = expensesInCurrentYear.reduce((acc, expense) => {
-    const month = format(parseDate(expense.date), "MMMM"); // Group by month name
+    const month = format(parseLocalDate(expense.date), "MMMM");
     acc[month] = (acc[month] || 0) + expense.amount;
     return acc;
   }, {} as Record<string, number>);
