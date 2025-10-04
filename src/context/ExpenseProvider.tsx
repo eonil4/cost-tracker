@@ -1,4 +1,4 @@
-import React, { useState, useEffect, type ReactNode } from "react";
+import React, { useState, useEffect, useCallback, type ReactNode } from "react";
 import { ExpenseContext } from "./ExpenseContext";
 import type { Expense } from "../types";
 
@@ -10,34 +10,61 @@ export const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) =>
   // Load persisted expenses safely and defensively
   const [expenses, setExpenses] = useState<Expense[]>(() => {
     try {
-      if (typeof window === "undefined") return [];
-      const savedExpenses = window.localStorage.getItem("expenses");
-      if (!savedExpenses) return [];
-      const parsed = JSON.parse(savedExpenses);
-      return Array.isArray(parsed) ? (parsed as Expense[]) : [];
-    } catch {
-      // Corrupted or inaccessible storage; start fresh
+      const savedExpenses = localStorage.getItem("expenses");
+      if (savedExpenses) {
+        const parsed = JSON.parse(savedExpenses);
+        // Validate that parsed data is an array
+        if (Array.isArray(parsed)) {
+          // Validate each expense object has required fields
+          const validExpenses = parsed.filter((expense: any) => 
+            expense && 
+            typeof expense.id === 'number' && 
+            typeof expense.description === 'string' && 
+            typeof expense.amount === 'number' && 
+            typeof expense.date === 'string' && 
+            typeof expense.currency === 'string' &&
+            expense.amount > 0
+          );
+          return validExpenses;
+        }
+      }
+      return [];
+    } catch (error) {
+      console.error("Error parsing expenses from localStorage:", error);
+      // Clear corrupted data
+      localStorage.removeItem("expenses");
       return [];
     }
   });
 
   useEffect(() => {
     try {
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem("expenses", JSON.stringify(expenses));
-      }
-    } catch {
-      // Ignore storage write failures
+      localStorage.setItem("expenses", JSON.stringify(expenses));
+    } catch (error) {
+      console.error("Error saving expenses to localStorage:", error);
     }
   }, [expenses]);
 
-  const addExpense = (expense: Expense) => {
+  const addExpense = useCallback((expense: Expense) => {
+    // Validate expense data before adding
+    if (!expense || 
+        typeof expense.id !== 'number' || 
+        typeof expense.description !== 'string' || 
+        typeof expense.amount !== 'number' || 
+        typeof expense.date !== 'string' || 
+        typeof expense.currency !== 'string' ||
+        expense.amount <= 0 ||
+        !expense.description.trim()) {
+      console.error("Invalid expense data:", expense);
+      return;
+    }
+    
     setExpenses((prevExpenses) => [...prevExpenses, expense]);
-  };
+  }, []);
 
-  const deleteExpense = (id: number) => {
+  const deleteExpense = useCallback((id: number) => {
     setExpenses((prevExpenses) => prevExpenses.filter((expense) => expense.id !== id));
-  };
+  }, []);
 
   return (
     <ExpenseContext.Provider value={{ expenses, addExpense, deleteExpense }}>
