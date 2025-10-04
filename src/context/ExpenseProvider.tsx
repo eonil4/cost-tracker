@@ -14,7 +14,17 @@ export const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) =>
         const parsed = JSON.parse(savedExpenses);
         // Validate that parsed data is an array
         if (Array.isArray(parsed)) {
-          return parsed;
+          // Validate each expense object has required fields
+          const validExpenses = parsed.filter((expense: any) => 
+            expense && 
+            typeof expense.id === 'number' && 
+            typeof expense.description === 'string' && 
+            typeof expense.amount === 'number' && 
+            typeof expense.date === 'string' && 
+            typeof expense.currency === 'string' &&
+            expense.amount > 0
+          );
+          return validExpenses;
         }
       }
       return [];
@@ -35,6 +45,19 @@ export const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) =>
   }, [expenses]);
 
   const addExpense = (expense: Expense) => {
+    // Validate expense data before adding
+    if (!expense || 
+        typeof expense.id !== 'number' || 
+        typeof expense.description !== 'string' || 
+        typeof expense.amount !== 'number' || 
+        typeof expense.date !== 'string' || 
+        typeof expense.currency !== 'string' ||
+        expense.amount <= 0 ||
+        !expense.description.trim()) {
+      console.error("Invalid expense data:", expense);
+      return;
+    }
+    
     setExpenses((prevExpenses) => [...prevExpenses, expense]);
   };
 
