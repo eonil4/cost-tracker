@@ -1,7 +1,7 @@
 import React, { useContext, useMemo, useCallback } from "react";
-import { ExpenseContext } from "../context/ExpenseContext";
+import { ExpenseContext } from "../../context/ExpenseContext";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import type { Expense } from "../types";
+import type { Expense } from "../../types";
 import {
   format,
   isWithinInterval,
@@ -228,3 +228,5 @@ const ExpenseSummary: React.FC = () => {
 };
 
 export default ExpenseSummary;
+
+

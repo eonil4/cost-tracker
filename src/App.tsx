@@ -1,11 +1,11 @@
 import React, { Suspense, lazy } from "react";
 import { ExpenseProvider } from "./context/ExpenseProvider";
-import ExpenseForm from "./components/ExpenseForm";
-import ExpenseList from "./components/ExpenseList";
+import ExpenseForm from "./components/form/ExpenseForm";
+import ExpenseList from "./components/list/ExpenseList";
 import { Container, Typography, Paper, CircularProgress, Box } from "@mui/material";
 
 // Lazy load the heavy ExpenseSummary component
-const ExpenseSummary = lazy(() => import("./components/ExpenseSummary"));
+const ExpenseSummary = lazy(() => import("./components/summary/ExpenseSummary"));
 
 const App: React.FC = () => {
   return (

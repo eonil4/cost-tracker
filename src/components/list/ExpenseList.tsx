@@ -1,5 +1,5 @@
 import React, { useContext, useState, useMemo } from "react";
-import { ExpenseContext } from "../context/ExpenseContext";
+import { ExpenseContext } from "../../context/ExpenseContext";
 import { DataGrid, type GridColDef, GridToolbar, type GridFilterOperator, type GridFilterInputValueProps } from "@mui/x-data-grid";
 import { 
   IconButton, 
@@ -20,7 +20,7 @@ import {
   Autocomplete
 } from "@mui/material";
 import { FaTrash, FaEdit } from "react-icons/fa";
-import type { Expense } from "../types";
+import type { Expense } from "../../types";
 
 const ExpenseList: React.FC = () => {
   const context = useContext(ExpenseContext);
@@ -404,3 +404,6 @@ const ExpenseList: React.FC = () => {
 };
 
 export default ExpenseList;
+
+
+
