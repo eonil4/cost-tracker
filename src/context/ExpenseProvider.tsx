@@ -62,12 +62,32 @@ export const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) =>
     setExpenses((prevExpenses) => [...prevExpenses, expense]);
   }, []);
 
+  const updateExpense = useCallback((id: number, updatedExpense: Omit<Expense, 'id'>) => {
+    // Validate updated expense data
+    if (!updatedExpense || 
+        typeof updatedExpense.description !== 'string' || 
+        typeof updatedExpense.amount !== 'number' || 
+        typeof updatedExpense.date !== 'string' || 
+        typeof updatedExpense.currency !== 'string' ||
+        updatedExpense.amount <= 0 ||
+        !updatedExpense.description.trim()) {
+      console.error("Invalid updated expense data:", updatedExpense);
+      return;
+    }
+    
+    setExpenses((prevExpenses) => 
+      prevExpenses.map((expense) => 
+        expense.id === id ? { ...updatedExpense, id } : expense
+      )
+    );
+  }, []);
+
   const deleteExpense = useCallback((id: number) => {
     setExpenses((prevExpenses) => prevExpenses.filter((expense) => expense.id !== id));
   }, []);
 
   return (
-    <ExpenseContext.Provider value={{ expenses, addExpense, deleteExpense }}>
+    <ExpenseContext.Provider value={{ expenses, addExpense, updateExpense, deleteExpense }}>
       {children}
     </ExpenseContext.Provider>
   );
