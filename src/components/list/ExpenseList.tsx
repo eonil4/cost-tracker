@@ -1,26 +1,12 @@
 import React, { useContext, useState, useMemo } from "react";
 import { ExpenseContext } from "../../context/ExpenseContext";
 import { DataGrid, type GridColDef, GridToolbar, type GridFilterOperator, type GridFilterInputValueProps } from "@mui/x-data-grid";
-import { 
-  IconButton, 
-  Dialog, 
-  DialogActions, 
-  DialogContent, 
-  DialogContentText, 
-  DialogTitle, 
-  Button,
-  TextField,
-  Box,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  Alert,
-  Snackbar,
-  Autocomplete
-} from "@mui/material";
+import { TextField, Box, Select, MenuItem, InputLabel, FormControl, Alert, Snackbar, Autocomplete } from "@mui/material";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import type { Expense } from "../../types";
+import ActionsCell from "./ActionsCell";
+import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
+import EditExpenseDialog from "./EditExpenseDialog";
 
 const ExpenseList: React.FC = () => {
   const context = useContext(ExpenseContext);
@@ -242,22 +228,7 @@ const ExpenseList: React.FC = () => {
       sortable: false,
       filterable: false,
       renderCell: (params) => (
-        <Box display="flex" gap={1}>
-          <IconButton
-            color="primary"
-            onClick={() => handleOpenEditDialog(params.row)} // Open the edit dialog
-            size="small"
-          >
-            <FaEdit />
-          </IconButton>
-          <IconButton
-            color="error"
-            onClick={() => handleOpenDialog(params.row.id)} // Open the confirmation dialog
-            size="small"
-          >
-            <FaTrash />
-          </IconButton>
-        </Box>
+        <ActionsCell row={params.row} onEdit={handleOpenEditDialog} onDelete={(id) => handleOpenDialog(id)} />
       ),
       flex: 0.8,
     },
@@ -292,101 +263,27 @@ const ExpenseList: React.FC = () => {
       />
 
       {/* Confirmation Dialog */}
-      <Dialog
-        open={open}
-        onClose={handleCloseDialog}
-        aria-labelledby="confirm-delete-dialog-title"
-        aria-describedby="confirm-delete-dialog-description"
-      >
-        <DialogTitle id="confirm-delete-dialog-title">Confirm Deletion</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="confirm-delete-dialog-description">
-            Are you sure you want to delete this expense? This action cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmDelete} color="error" autoFocus>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmDeleteDialog open={open} onClose={handleCloseDialog} onConfirm={handleConfirmDelete} />
 
       {/* Edit Dialog */}
-      <Dialog
+      <EditExpenseDialog
         open={editOpen}
         onClose={handleCloseEditDialog}
-        aria-labelledby="edit-expense-dialog-title"
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle id="edit-expense-dialog-title">Edit Expense</DialogTitle>
-        <DialogContent>
-          <Box display="flex" flexDirection="column" gap={2} sx={{ mt: 1 }}>
-            {/* Description Input with Autocomplete */}
-            <Autocomplete
-              options={uniqueDescriptions}
-              freeSolo
-              inputValue={editDescription}
-              onInputChange={(_, newInputValue) => setEditDescription(newInputValue)}
-              onChange={(_, newValue) => {
-                if (typeof newValue === "string") {
-                  setEditDescription(newValue);
-                } else if (newValue != null) {
-                  setEditDescription(String(newValue));
-                }
-              }}
-              renderInput={(params) => (
-                <TextField {...params} label="Description" variant="outlined" fullWidth />
-              )}
-            />
-            {/* Amount Input */}
-            <TextField
-              label="Amount"
-              variant="outlined"
-              type="number"
-              value={editAmount}
-              onChange={(e) => setEditAmount(e.target.value)}
-              fullWidth
-            />
-            {/* Date Input */}
-            <TextField
-              label="Date"
-              variant="outlined"
-              type="date"
-              value={editDate}
-              onChange={(e) => setEditDate(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              fullWidth
-            />
-            {/* Currency Selector */}
-            <FormControl fullWidth>
-              <InputLabel>Currency</InputLabel>
-              <Select
-                value={editCurrency}
-                onChange={(e) => setEditCurrency(e.target.value)}
-                label="Currency"
-              >
-                {validCurrencies.map((curr) => (
-                  <MenuItem key={curr} value={curr}>
-                    {curr}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseEditDialog} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleEditSubmit} color="primary" variant="contained">
-            Update
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onSubmit={handleEditSubmit}
+        validCurrencies={validCurrencies}
+        uniqueDescriptions={uniqueDescriptions}
+        editDescription={editDescription}
+        setEditDescription={setEditDescription}
+        editAmount={editAmount}
+        setEditAmount={setEditAmount}
+        editDate={editDate}
+        setEditDate={setEditDate}
+        editCurrency={editCurrency}
+        setEditCurrency={setEditCurrency}
+        showError={showError}
+        setShowError={setShowError}
+        errorMessage={errorMessage}
+      />
 
       {/* Error Snackbar */}
       <Snackbar

@@ -1,6 +1,6 @@
 import React, { useContext, useMemo, useCallback } from "react";
 import { ExpenseContext } from "../../context/ExpenseContext";
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import PieSection from "./PieSection";
 import type { Expense } from "../../types";
 import {
   format,
@@ -13,12 +13,9 @@ import {
   endOfYear,
 } from "date-fns";
 import { Typography, Box, Divider } from "@mui/material";
+import { SUMMARY_COLORS } from "./colors";
 
-// Define colors for the pie chart
-const COLORS = [
-  "#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A28DFF", "#FF6666", "#66CCFF",
-  "#FF99CC", "#99CCFF", "#FFCC99", "#99FF99", "#CC99FF",
-];
+// Colors moved to shared SUMMARY_COLORS
 
 const ExpenseSummary: React.FC = () => {
   const context = useContext(ExpenseContext);
@@ -133,93 +130,21 @@ const ExpenseSummary: React.FC = () => {
   return (
     <Box>
       {/* Daily Costs (Current Week) */}
-      <Typography variant="h6" align="center" gutterBottom>
-        Daily Costs (Current Week)
-      </Typography>
-      <Box style={{ width: "100%", height: 300 }}>
-        <ResponsiveContainer>
-          <PieChart>
-            <Pie
-              data={summaryData.dailyData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              fill="#8884d8"
-              label
-            >
-              {summaryData.dailyData.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
-      </Box>
+      <PieSection title="Daily Costs (Current Week)" data={summaryData.dailyData} color="#8884d8" />
       <Typography align="center" variant="subtitle1">
         Weekly Total: {summaryData.weeklySummary.toFixed(2)} {summaryData.getMostCommonCurrency(summaryData.expensesInCurrentWeek)}
       </Typography>
       <Divider style={{ margin: "1rem 0" }} />
 
       {/* Weekly Costs (Current Month) */}
-      <Typography variant="h6" align="center" gutterBottom>
-        Weekly Costs (Current Month)
-      </Typography>
-      <Box style={{ width: "100%", height: 300 }}>
-        <ResponsiveContainer>
-          <PieChart>
-            <Pie
-              data={summaryData.weeklyData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              fill="#82ca9d"
-              label
-            >
-              {summaryData.weeklyData.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
-      </Box>
+      <PieSection title="Weekly Costs (Current Month)" data={summaryData.weeklyData} color="#82ca9d" />
       <Typography align="center" variant="subtitle1">
         Monthly Total: {summaryData.monthlySummary.toFixed(2)} {summaryData.getMostCommonCurrency(summaryData.expensesInCurrentMonth)}
       </Typography>
       <Divider style={{ margin: "1rem 0" }} />
 
       {/* Monthly Costs (Current Year) */}
-      <Typography variant="h6" align="center" gutterBottom>
-        Monthly Costs (Current Year)
-      </Typography>
-      <Box style={{ width: "100%", height: 300 }}>
-        <ResponsiveContainer>
-          <PieChart>
-            <Pie
-              data={summaryData.monthlyData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              fill="#FF8042"
-              label
-            >
-              {summaryData.monthlyData.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
-      </Box>
+      <PieSection title="Monthly Costs (Current Year)" data={summaryData.monthlyData} color="#FF8042" />
       <Typography align="center" variant="subtitle1">
         Yearly Total: {summaryData.yearlySummary.toFixed(2)} {summaryData.getMostCommonCurrency(summaryData.expensesInCurrentYear)}
       </Typography>
