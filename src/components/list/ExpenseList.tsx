@@ -213,13 +213,14 @@ const ExpenseList: React.FC = () => {
 
   // Define columns for the DataGrid
   const columns: GridColDef[] = [
-    { field: "description", headerName: "Description", flex: 1, filterOperators: descriptionFilterOperators },
-    { field: "amount", headerName: "Amount", type: "number", flex: 1 },
+    { field: "description", headerName: "Description", flex: 1, minWidth: 280, filterOperators: descriptionFilterOperators },
+    { field: "amount", headerName: "Amount", type: "number", width: 140, align: "right", headerAlign: "right" },
     { field: "currency", headerName: "Currency", flex: 1, filterOperators: currencyFilterOperators },
     {
       field: "date",
       headerName: "Date",
       flex: 1,
+      minWidth: 160,
       filterOperators: dateFilterOperators,
     },
     {
