@@ -1,6 +1,6 @@
 import React, { useContext, useState, useMemo } from "react";
 import { ExpenseContext } from "../context/ExpenseContext";
-import { DataGrid, type GridColDef } from "@mui/x-data-grid";
+import { DataGrid, type GridColDef, GridToolbar } from "@mui/x-data-grid";
 import { 
   IconButton, 
   Dialog, 
@@ -172,12 +172,22 @@ const ExpenseList: React.FC = () => {
       <DataGrid
         rows={expenses}
         columns={columns}
+        slots={{ toolbar: GridToolbar }}
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+            quickFilterProps: { debounceMs: 300 },
+          },
+        }}
         initialState={{
           pagination: {
             paginationModel: { pageSize: 5, page: 0 },
           },
           sorting: {
             sortModel: [{ field: "date", sort: "desc" }],
+          },
+          filter: {
+            filterModel: { items: [] },
           },
         }}
         pageSizeOptions={[5, 10, 20]}
