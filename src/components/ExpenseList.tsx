@@ -1,6 +1,6 @@
 import React, { useContext, useState, useMemo } from "react";
 import { ExpenseContext } from "../context/ExpenseContext";
-import { DataGrid, type GridColDef, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, type GridColDef, GridToolbar, type GridFilterOperator, type GridFilterInputValueProps } from "@mui/x-data-grid";
 import { 
   IconButton, 
   Dialog, 
@@ -50,6 +50,101 @@ const ExpenseList: React.FC = () => {
     () => Array.from(new Set(expenses.map((exp) => exp.description))),
     [expenses]
   );
+
+
+  // Autocomplete filter input for description ("contains")
+  const DescriptionFilterInput: React.FC<GridFilterInputValueProps> = (props) => {
+    const inputValue = (props.item.value as string) ?? "";
+    return (
+      <Autocomplete
+        options={uniqueDescriptions}
+        freeSolo
+        inputValue={inputValue}
+        onInputChange={(_, newInputValue) =>
+          props.applyValue({ ...props.item, value: newInputValue })
+        }
+        renderInput={(params) => (
+          <TextField {...params} label="Filter value" inputRef={props.focusElementRef} />
+        )}
+      />
+    );
+  };
+
+  // Autocomplete filter input for currency ("is")
+  const CurrencyFilterInput: React.FC<GridFilterInputValueProps> = (props) => {
+    const value = (props.item.value as string) ?? "";
+    return (
+      <Autocomplete
+        options={validCurrencies}
+        value={value}
+        ListboxProps={{
+          style: { maxHeight: 36 * 5, overflowY: "auto" },
+        }}
+        onChange={(_, newValue) =>
+          props.applyValue({ ...props.item, value: newValue ?? "" })
+        }
+        renderInput={(params) => (
+          <TextField {...params} label="Currency" inputRef={props.focusElementRef} />
+        )}
+      />
+    );
+  };
+
+  const descriptionFilterOperators: GridFilterOperator[] = [
+    {
+      label: "contains",
+      value: "contains",
+      getApplyFilterFn: (filterItem) => {
+        const filterValue = (filterItem.value ?? "").toString().toLowerCase();
+        if (!filterValue) return null;
+        return (params) =>
+          (params.value ?? "").toString().toLowerCase().includes(filterValue);
+      },
+      InputComponent: DescriptionFilterInput,
+    },
+  ];
+
+  const currencyFilterOperators: GridFilterOperator[] = [
+    {
+      label: "is",
+      value: "is",
+      getApplyFilterFn: (filterItem) => {
+        const filterValue = (filterItem.value ?? "").toString();
+        if (!filterValue) return null;
+        return (params) => (params.value ?? "").toString() === filterValue;
+      },
+      InputComponent: CurrencyFilterInput,
+    },
+  ];
+
+  // Date filter input using native date selector (YYYY-MM-DD)
+  const DateFilterInput: React.FC<GridFilterInputValueProps> = (props) => {
+    const value = (props.item.value as string) ?? "";
+    return (
+      <TextField
+        type="date"
+        label="Date"
+        value={value}
+        onChange={(e) => props.applyValue({ ...props.item, value: e.target.value })}
+        InputLabelProps={{ shrink: true }}
+        inputRef={props.focusElementRef}
+        fullWidth
+      />
+    );
+  };
+
+  const dateFilterOperators: GridFilterOperator[] = [
+    {
+      label: "is",
+      value: "is",
+      getApplyFilterFn: (filterItem) => {
+        const filterValue = (filterItem.value ?? "").toString();
+        if (!filterValue) return null;
+        return (params) => (params.value ?? "").toString() === filterValue;
+      },
+      InputComponent: DateFilterInput,
+    },
+  ];
 
   // Open the confirmation dialog
   const handleOpenDialog = (id: number) => {
@@ -132,13 +227,14 @@ const ExpenseList: React.FC = () => {
 
   // Define columns for the DataGrid
   const columns: GridColDef[] = [
-    { field: "description", headerName: "Description", flex: 1 },
+    { field: "description", headerName: "Description", flex: 1, filterOperators: descriptionFilterOperators },
     { field: "amount", headerName: "Amount", type: "number", flex: 1 },
-    { field: "currency", headerName: "Currency", flex: 1 },
+    { field: "currency", headerName: "Currency", flex: 1, filterOperators: currencyFilterOperators },
     {
       field: "date",
       headerName: "Date",
       flex: 1,
+      filterOperators: dateFilterOperators,
     },
     {
       field: "actions",
