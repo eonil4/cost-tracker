@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useMemo } from "react";
 import { ExpenseContext } from "../context/ExpenseContext";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import { 
@@ -16,7 +16,8 @@ import {
   InputLabel,
   FormControl,
   Alert,
-  Snackbar
+  Snackbar,
+  Autocomplete
 } from "@mui/material";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import type { Expense } from "../types";
@@ -43,6 +44,12 @@ const ExpenseList: React.FC = () => {
   const [editCurrency, setEditCurrency] = useState<string>("HUF");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showError, setShowError] = useState<boolean>(false);
+
+  // Extract unique descriptions from existing expenses for autocomplete options
+  const uniqueDescriptions = useMemo(
+    () => Array.from(new Set(expenses.map((exp) => exp.description))),
+    [expenses]
+  );
 
   // Open the confirmation dialog
   const handleOpenDialog = (id: number) => {
@@ -212,13 +219,22 @@ const ExpenseList: React.FC = () => {
         <DialogTitle id="edit-expense-dialog-title">Edit Expense</DialogTitle>
         <DialogContent>
           <Box display="flex" flexDirection="column" gap={2} sx={{ mt: 1 }}>
-            {/* Description Input */}
-            <TextField
-              label="Description"
-              variant="outlined"
-              value={editDescription}
-              onChange={(e) => setEditDescription(e.target.value)}
-              fullWidth
+            {/* Description Input with Autocomplete */}
+            <Autocomplete
+              options={uniqueDescriptions}
+              freeSolo
+              inputValue={editDescription}
+              onInputChange={(_, newInputValue) => setEditDescription(newInputValue)}
+              onChange={(_, newValue) => {
+                if (typeof newValue === "string") {
+                  setEditDescription(newValue);
+                } else if (newValue != null) {
+                  setEditDescription(String(newValue));
+                }
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Description" variant="outlined" fullWidth />
+              )}
             />
             {/* Amount Input */}
             <TextField
