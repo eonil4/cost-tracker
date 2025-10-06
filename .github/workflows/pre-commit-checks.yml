@@ -1,0 +1,102 @@
+name: Pre-commit Checks
+
+on:
+  push:
+    branches: [ main, develop, develop-local-storage ]
+  pull_request:
+    branches: [ main, develop, develop-local-storage ]
+  workflow_dispatch:
+
+jobs:
+  pre-commit-checks:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch full history for better diff detection
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Get changed files
+      id: changed-files
+      run: |
+        # Get list of changed files in src directory
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep '^src/' || true)
+        else
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | grep '^src/' || true)
+        fi
+        
+        if [ -z "$CHANGED_FILES" ]; then
+          echo "No files changed in src directory"
+          echo "changed=false" >> $GITHUB_OUTPUT
+        else
+          echo "Changed files in src directory:"
+          echo "$CHANGED_FILES"
+          echo "changed=true" >> $GITHUB_OUTPUT
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Run ESLint on changed files
+      if: steps.changed-files.outputs.changed == 'true'
+      run: |
+        echo "${{ steps.changed-files.outputs.files }}" | xargs -r npx eslint
+    
+    - name: Run build
+      run: npm run build
+    
+    - name: Run tests with coverage on changed files
+      if: steps.changed-files.outputs.changed == 'true'
+      run: |
+        # Create a temporary vitest config that only runs tests for changed files
+        CHANGED_FILES="${{ steps.changed-files.outputs.files }}"
+        
+        # Extract test files from changed source files
+        TEST_FILES=""
+        for file in $CHANGED_FILES; do
+          # Convert src/path/file.tsx to src/test/path/file.test.tsx
+          if [[ $file == src/* ]]; then
+            # Remove src/ prefix and .tsx/.ts extension
+            base_file=$(echo "$file" | sed 's|^src/||' | sed 's|\.tsx$||' | sed 's|\.ts$||')
+            test_file="src/test/${base_file}.test.tsx"
+            if [ -f "$test_file" ]; then
+              TEST_FILES="$TEST_FILES $test_file"
+            fi
+            # Also check for .test.ts files
+            test_file_ts="src/test/${base_file}.test.ts"
+            if [ -f "$test_file_ts" ]; then
+              TEST_FILES="$TEST_FILES $test_file_ts"
+            fi
+          fi
+        done
+        
+        if [ -n "$TEST_FILES" ]; then
+          echo "Running tests for: $TEST_FILES"
+          npx vitest run --coverage $TEST_FILES
+        else
+          echo "No corresponding test files found for changed source files"
+        fi
+    
+    - name: Run all tests if no specific files changed
+      if: steps.changed-files.outputs.changed == 'false'
+      run: npm run test:run:coverage
+    
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v4
+      if: always()
+      with:
+        file: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
