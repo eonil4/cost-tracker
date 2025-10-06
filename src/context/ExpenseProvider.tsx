@@ -16,14 +16,21 @@ export const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) =>
         // Validate that parsed data is an array
         if (Array.isArray(parsed)) {
           // Validate each expense object has required fields
-          const validExpenses = parsed.filter((expense: any) => 
+          const validExpenses = parsed.filter((expense: unknown) => 
             expense && 
-            typeof expense.id === 'number' && 
-            typeof expense.description === 'string' && 
-            typeof expense.amount === 'number' && 
-            typeof expense.date === 'string' && 
-            typeof expense.currency === 'string' &&
-            expense.amount > 0
+            typeof expense === 'object' &&
+            expense !== null &&
+            'id' in expense &&
+            'description' in expense &&
+            'amount' in expense &&
+            'date' in expense &&
+            'currency' in expense &&
+            typeof (expense as Record<string, unknown>).id === 'number' && 
+            typeof (expense as Record<string, unknown>).description === 'string' && 
+            typeof (expense as Record<string, unknown>).amount === 'number' && 
+            typeof (expense as Record<string, unknown>).date === 'string' && 
+            typeof (expense as Record<string, unknown>).currency === 'string' &&
+            (expense as Record<string, unknown>).amount as number > 0
           );
           return validExpenses;
         }

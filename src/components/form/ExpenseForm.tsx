@@ -29,7 +29,7 @@ const ExpenseForm: React.FC = () => {
   };
 
   // Valid currencies
-  const validCurrencies = ["HUF", "USD", "EUR", "GBP"];
+  const validCurrencies = useMemo(() => ["HUF", "USD", "EUR", "GBP"], []);
 
   // Form state
   const [description, setDescription] = useState<string>(""); // State for description
