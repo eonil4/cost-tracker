@@ -1,5 +1,6 @@
 import React from "react";
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Box, FormControl, InputLabel, Select, MenuItem, Autocomplete, Alert, Snackbar } from "@mui/material";
+import { handleAutocompleteChange, renderAutocompleteInput } from "../../utils/autocompleteUtils";
 
 interface EditExpenseDialogProps {
   open: boolean;
@@ -48,13 +49,8 @@ const EditExpenseDialog: React.FC<EditExpenseDialogProps> = ({
             freeSolo
             inputValue={editDescription}
             onInputChange={(_, v) => setEditDescription(v)}
-            onChange={(_, v) => {
-              if (typeof v === "string") setEditDescription(v);
-              else if (v != null) setEditDescription(String(v));
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Description" variant="outlined" fullWidth />
-            )}
+            onChange={(_, v) => handleAutocompleteChange(v, setEditDescription)}
+            renderInput={(params) => renderAutocompleteInput(params, "Description")}
           />
           <TextField label="Amount" variant="outlined" type="number" value={editAmount} onChange={(e) => setEditAmount(e.target.value)} fullWidth />
           <TextField label="Date" variant="outlined" type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} InputLabelProps={{ shrink: true }} fullWidth />

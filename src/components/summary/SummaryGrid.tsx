@@ -13,6 +13,13 @@ import {
   startOfYear,
   endOfYear,
 } from "date-fns";
+import { 
+  calculateWeeklyCosts, 
+  calculateMonthlyCosts,
+  convertCostsToChartData,
+  calculateTotalCosts,
+  countCurrencies
+} from "../../utils/calculationUtils";
 
 const SummaryGrid: React.FC = () => {
   const context = useContext(ExpenseContext);
@@ -51,16 +58,9 @@ const SummaryGrid: React.FC = () => {
     const expensesInCurrentMonth = expenses.filter((expense) =>
       isWithinInterval(parseDate(expense.date), { start: monthStart, end: monthEnd })
     );
-    const weeklyCosts = expensesInCurrentMonth.reduce((acc, expense) => {
-      const d = parseDate(expense.date);
-      const ws = startOfWeek(d, { weekStartsOn: 1 });
-      const we = endOfWeek(d, { weekStartsOn: 1 });
-      const key = `${format(ws, "yyyy-MM-dd")} - ${format(we, "yyyy-MM-dd")}`;
-      acc[key] = (acc[key] || 0) + expense.amount;
-      return acc;
-    }, {} as Record<string, number>);
-    const weeklyData = Object.entries(weeklyCosts).map(([name, value]) => ({ name, value }));
-    const monthlyTotal = Object.values(weeklyCosts).reduce((sum, v) => sum + v, 0);
+    const weeklyCosts = calculateWeeklyCosts(expensesInCurrentMonth);
+    const weeklyData = convertCostsToChartData(weeklyCosts);
+    const monthlyTotal = calculateTotalCosts(weeklyCosts);
 
     // Year
     const yearStart = startOfYear(today);
@@ -68,20 +68,13 @@ const SummaryGrid: React.FC = () => {
     const expensesInCurrentYear = expenses.filter((expense) =>
       isWithinInterval(parseDate(expense.date), { start: yearStart, end: yearEnd })
     );
-    const monthlyCosts = expensesInCurrentYear.reduce((acc, expense) => {
-      const month = format(parseDate(expense.date), "MMMM");
-      acc[month] = (acc[month] || 0) + expense.amount;
-      return acc;
-    }, {} as Record<string, number>);
-    const monthlyData = Object.entries(monthlyCosts).map(([name, value]) => ({ name, value }));
-    const yearlyTotal = Object.values(monthlyCosts).reduce((sum, v) => sum + v, 0);
+    const monthlyCosts = calculateMonthlyCosts(expensesInCurrentYear);
+    const monthlyData = convertCostsToChartData(monthlyCosts);
+    const yearlyTotal = calculateTotalCosts(monthlyCosts);
 
     const getMostCommonCurrency = (list: Expense[]): string => {
       if (list.length === 0) return "HUF";
-      const currencyCount = list.reduce((acc, e) => {
-        acc[e.currency] = (acc[e.currency] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      const currencyCount = countCurrencies(list);
       const entries = Object.entries(currencyCount);
       if (entries.length === 0) return "HUF";
       return entries.reduce((a, b) => (currencyCount[a[0]] > currencyCount[b[0]] ? a : b))[0];
