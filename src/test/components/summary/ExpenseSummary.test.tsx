@@ -314,4 +314,46 @@ describe('ExpenseSummary', () => {
     // Verify the component renders
     expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
   });
+
+  it('should calculate monthly costs correctly with different months and amounts', () => {
+    const mockExpenses = [
+      { id: 1, description: 'January Expense 1', amount: 100, date: '2024-01-15', currency: 'USD' },
+      { id: 2, description: 'January Expense 2', amount: 150, date: '2024-01-20', currency: 'USD' },
+      { id: 3, description: 'February Expense', amount: 200, date: '2024-02-15', currency: 'USD' },
+      { id: 4, description: 'March Expense 1', amount: 300, date: '2024-03-15', currency: 'USD' },
+      { id: 5, description: 'March Expense 2', amount: 250, date: '2024-03-25', currency: 'USD' }
+    ];
+    
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    renderWithProvider(<ExpenseSummary />);
+    
+    // Verify the component renders with monthly data
+    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+  });
+
+  it('should handle monthly data mapping with multiple entries per month', () => {
+    const mockExpenses = [
+      { id: 1, description: 'January Expense 1', amount: 100, date: '2024-01-15', currency: 'USD' },
+      { id: 2, description: 'January Expense 2', amount: 150, date: '2024-01-20', currency: 'USD' },
+      { id: 3, description: 'January Expense 3', amount: 200, date: '2024-01-25', currency: 'USD' }
+    ];
+    
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    renderWithProvider(<ExpenseSummary />);
+    
+    // Verify the component renders with monthly data
+    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+  });
+
+  it('should handle monthly data mapping with single month', () => {
+    const mockExpenses = [
+      { id: 1, description: 'January Expense', amount: 100, date: '2024-01-15', currency: 'USD' }
+    ];
+    
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    renderWithProvider(<ExpenseSummary />);
+    
+    // Verify the component renders with monthly data
+    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+  });
 });

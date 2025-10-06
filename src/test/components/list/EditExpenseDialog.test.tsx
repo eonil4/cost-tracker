@@ -315,4 +315,14 @@ describe('EditExpenseDialog', () => {
     // Verify the autocomplete input is rendered with proper props
     expect(autocompleteInput).toBeInTheDocument();
   });
+
+  it('should render autocomplete with renderInput function', () => {
+    render(<EditExpenseDialog {...defaultProps} />);
+    
+    const autocomplete = screen.getByTestId('autocomplete');
+    const autocompleteInput = screen.getByTestId('autocomplete-input');
+    
+    expect(autocomplete).toBeInTheDocument();
+    expect(autocompleteInput).toBeInTheDocument();
+  });
 });

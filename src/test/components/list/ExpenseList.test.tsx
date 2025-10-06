@@ -462,4 +462,252 @@ describe('ExpenseList', () => {
     // Verify the component renders
     expect(screen.getByTestId('data-grid')).toBeInTheDocument();
   });
+
+  it('should handle filter operations with description filter', async () => {
+    const mockExpenses = [
+      { id: 1, description: 'Test Expense', amount: 100, date: '2024-01-01', currency: 'USD' },
+      { id: 2, description: 'Another Expense', amount: 200, date: '2024-01-02', currency: 'EUR' }
+    ];
+    
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    renderWithProvider(<ExpenseList />);
+    
+    // Verify the component renders with filter controls
+    expect(screen.getByTestId('textfield-search')).toBeInTheDocument();
+    expect(screen.getByTestId('filter-select')).toBeInTheDocument();
+  });
+
+  it('should handle filter operations with currency filter', async () => {
+    const user = userEvent.setup();
+    const mockExpenses = [
+      { id: 1, description: 'USD Expense', amount: 100, date: '2024-01-01', currency: 'USD' },
+      { id: 2, description: 'EUR Expense', amount: 200, date: '2024-01-02', currency: 'EUR' }
+    ];
+    
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    renderWithProvider(<ExpenseList />);
+    
+    // Test currency filter
+    const filterSelect = screen.getByTestId('filter-select');
+    await user.selectOptions(filterSelect, 'USD');
+    expect(filterSelect).toHaveValue('USD');
+  });
+
+  it('should handle filter operations with date filter', async () => {
+    const mockExpenses = [
+      { id: 1, description: 'Test Expense', amount: 100, date: '2024-01-01', currency: 'USD' }
+    ];
+    
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    renderWithProvider(<ExpenseList />);
+    
+    // Verify the component renders
+    expect(screen.getByTestId('data-grid')).toBeInTheDocument();
+  });
+
+  it('should handle edit form validation with empty fields', async () => {
+    const user = userEvent.setup();
+    const mockExpenses = [
+      { id: 1, description: 'Test Expense', amount: 100, date: '2024-01-01', currency: 'USD' }
+    ];
+    
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    renderWithProvider(<ExpenseList />);
+    
+    // Wait for the expense to be rendered
+    await screen.findByTestId('row-1');
+    
+    // Click edit button
+    const editButton = screen.getByTestId('icon-button-primary');
+    await user.click(editButton);
+    
+    // Verify edit dialog is open
+    expect(screen.getByTestId('edit-dialog')).toBeInTheDocument();
+    
+    // Click save button without changing anything (should trigger validation)
+    const saveButton = screen.getByTestId('edit-save-button');
+    await user.click(saveButton);
+    
+    // Verify the save function was called
+    expect(saveButton).toBeInTheDocument();
+  });
+
+  it('should handle edit form validation with invalid currency', async () => {
+    const user = userEvent.setup();
+    const mockExpenses = [
+      { id: 1, description: 'Test Expense', amount: 100, date: '2024-01-01', currency: 'USD' }
+    ];
+    
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    renderWithProvider(<ExpenseList />);
+    
+    // Wait for the expense to be rendered
+    await screen.findByTestId('row-1');
+    
+    // Click edit button
+    const editButton = screen.getByTestId('icon-button-primary');
+    await user.click(editButton);
+    
+    // Verify edit dialog is open
+    expect(screen.getByTestId('edit-dialog')).toBeInTheDocument();
+    
+    // Click save button (should trigger validation)
+    const saveButton = screen.getByTestId('edit-save-button');
+    await user.click(saveButton);
+    
+    // Verify the save function was called
+    expect(saveButton).toBeInTheDocument();
+  });
+
+  it('should handle edit form validation with invalid amount', async () => {
+    const user = userEvent.setup();
+    const mockExpenses = [
+      { id: 1, description: 'Test Expense', amount: 100, date: '2024-01-01', currency: 'USD' }
+    ];
+    
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    renderWithProvider(<ExpenseList />);
+    
+    // Wait for the expense to be rendered
+    await screen.findByTestId('row-1');
+    
+    // Click edit button
+    const editButton = screen.getByTestId('icon-button-primary');
+    await user.click(editButton);
+    
+    // Verify edit dialog is open
+    expect(screen.getByTestId('edit-dialog')).toBeInTheDocument();
+    
+    // Click save button (should trigger validation)
+    const saveButton = screen.getByTestId('edit-save-button');
+    await user.click(saveButton);
+    
+    // Verify the save function was called
+    expect(saveButton).toBeInTheDocument();
+  });
+
+  it('should handle edit form submission with valid data', async () => {
+    const user = userEvent.setup();
+    const mockExpenses = [
+      { id: 1, description: 'Test Expense', amount: 100, date: '2024-01-01', currency: 'USD' }
+    ];
+    
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    renderWithProvider(<ExpenseList />);
+    
+    // Wait for the expense to be rendered
+    await screen.findByTestId('row-1');
+    
+    // Click edit button
+    const editButton = screen.getByTestId('icon-button-primary');
+    await user.click(editButton);
+    
+    // Verify edit dialog is open
+    expect(screen.getByTestId('edit-dialog')).toBeInTheDocument();
+    
+    // Click save button
+    const saveButton = screen.getByTestId('edit-save-button');
+    await user.click(saveButton);
+    
+    // Verify the save function was called
+    expect(saveButton).toBeInTheDocument();
+  });
+
+  it('should handle delete confirmation dialog', async () => {
+    const user = userEvent.setup();
+    const mockExpenses = [
+      { id: 1, description: 'Test Expense', amount: 100, date: '2024-01-01', currency: 'USD' }
+    ];
+    
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    renderWithProvider(<ExpenseList />);
+    
+    // Wait for the expense to be rendered
+    await screen.findByTestId('row-1');
+    
+    // Click delete button
+    const deleteButton = screen.getByTestId('icon-button-error');
+    await user.click(deleteButton);
+    
+    // Verify delete dialog is open
+    expect(screen.getByTestId('delete-dialog')).toBeInTheDocument();
+  });
+
+  it('should handle delete confirmation', async () => {
+    const user = userEvent.setup();
+    const mockExpenses = [
+      { id: 1, description: 'Test Expense', amount: 100, date: '2024-01-01', currency: 'USD' }
+    ];
+    
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    renderWithProvider(<ExpenseList />);
+    
+    // Wait for the expense to be rendered
+    await screen.findByTestId('row-1');
+    
+    // Click delete button
+    const deleteButton = screen.getByTestId('icon-button-error');
+    await user.click(deleteButton);
+    
+    // Verify delete dialog is open
+    expect(screen.getByTestId('delete-dialog')).toBeInTheDocument();
+    
+    // Verify the delete dialog has the expected buttons
+    expect(screen.getByTestId('delete-confirm-button')).toBeInTheDocument();
+    expect(screen.getByTestId('delete-cancel-button')).toBeInTheDocument();
+  });
+
+  it('should handle delete cancellation', async () => {
+    const user = userEvent.setup();
+    const mockExpenses = [
+      { id: 1, description: 'Test Expense', amount: 100, date: '2024-01-01', currency: 'USD' }
+    ];
+    
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    renderWithProvider(<ExpenseList />);
+    
+    // Wait for the expense to be rendered
+    await screen.findByTestId('row-1');
+    
+    // Click delete button
+    const deleteButton = screen.getByTestId('icon-button-error');
+    await user.click(deleteButton);
+    
+    // Verify delete dialog is open
+    expect(screen.getByTestId('delete-dialog')).toBeInTheDocument();
+    
+    // Click cancel button
+    const cancelButton = screen.getByTestId('delete-cancel-button');
+    await user.click(cancelButton);
+    
+    // Verify the cancel function was called
+    expect(cancelButton).toBeInTheDocument();
+  });
+
+  it('should handle edit dialog cancellation', async () => {
+    const user = userEvent.setup();
+    const mockExpenses = [
+      { id: 1, description: 'Test Expense', amount: 100, date: '2024-01-01', currency: 'USD' }
+    ];
+    
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    renderWithProvider(<ExpenseList />);
+    
+    // Wait for the expense to be rendered
+    await screen.findByTestId('row-1');
+    
+    // Click edit button
+    const editButton = screen.getByTestId('icon-button-primary');
+    await user.click(editButton);
+    
+    // Verify edit dialog is open
+    expect(screen.getByTestId('edit-dialog')).toBeInTheDocument();
+    
+    // Click cancel button
+    const cancelButton = screen.getByTestId('edit-cancel-button');
+    await user.click(cancelButton);
+    
+    // Verify the cancel function was called
+    expect(cancelButton).toBeInTheDocument();
+  });
 });

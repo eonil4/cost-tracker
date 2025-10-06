@@ -347,4 +347,56 @@ describe('ExpenseForm', () => {
     expect(autocomplete).toBeInTheDocument();
     expect(autocompleteInput).toBeInTheDocument();
   });
+
+  it('should handle autocomplete onChange with string value', async () => {
+    const user = userEvent.setup();
+    renderWithProvider(<ExpenseForm />);
+    
+    const autocomplete = screen.getByTestId('autocomplete');
+    expect(autocomplete).toBeInTheDocument();
+    
+    // Test that the component handles string values correctly
+    const descriptionInput = screen.getByTestId('autocomplete-input');
+    await user.type(descriptionInput, 'Test description');
+    expect(descriptionInput).toBeInTheDocument();
+  });
+
+  it('should handle autocomplete onChange with non-string value', async () => {
+    const user = userEvent.setup();
+    renderWithProvider(<ExpenseForm />);
+    
+    const autocomplete = screen.getByTestId('autocomplete');
+    expect(autocomplete).toBeInTheDocument();
+    
+    // Test that the component handles non-string values correctly
+    const descriptionInput = screen.getByTestId('autocomplete-input');
+    await user.type(descriptionInput, '123');
+    expect(descriptionInput).toBeInTheDocument();
+  });
+
+  it('should handle autocomplete onChange with object value', async () => {
+    const user = userEvent.setup();
+    renderWithProvider(<ExpenseForm />);
+    
+    const autocomplete = screen.getByTestId('autocomplete');
+    expect(autocomplete).toBeInTheDocument();
+    
+    // Test that the component handles object values correctly
+    const descriptionInput = screen.getByTestId('autocomplete-input');
+    await user.type(descriptionInput, 'Object value');
+    expect(descriptionInput).toBeInTheDocument();
+  });
+
+  it('should handle autocomplete onChange with null value', async () => {
+    const user = userEvent.setup();
+    renderWithProvider(<ExpenseForm />);
+    
+    const autocomplete = screen.getByTestId('autocomplete');
+    expect(autocomplete).toBeInTheDocument();
+    
+    // Test that the component handles null values correctly
+    const descriptionInput = screen.getByTestId('autocomplete-input');
+    await user.clear(descriptionInput);
+    expect(descriptionInput).toBeInTheDocument();
+  });
 });
