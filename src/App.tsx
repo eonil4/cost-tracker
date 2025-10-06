@@ -9,17 +9,17 @@ import SummaryGrid from "./components/summary/SummaryGrid";
 const App: React.FC = () => {
   return (
     <ExpenseProvider>
-      <Container maxWidth="lg" style={{ marginTop: "2rem", marginBottom: "2rem" }}>
-        <Typography variant="h4" align="center" gutterBottom  style={{ height: "100%", width: "1020px" }}>
+      <Container maxWidth="xl" sx={{ marginTop: 3, marginBottom: 3, px: { xs: 2, sm: 3, md: 4 } }}>
+        <Typography variant="h4" align="center" gutterBottom sx={{ mb: 4 }}>
           Cost Tracker
         </Typography>
-        <Grid container rowSpacing={3} columnSpacing={3}>
+        <Grid container spacing={3}>
           {/* Row 1: Form + List */}
-          <Grid size={12} style={{ marginBottom: "1.5rem" }}>
+          <Grid size={12}>
             <Grid container spacing={3}>
               {/* Form Tile */}
               <Grid size={{ xs: 12, md: 4 }}>
-                <Paper elevation={3} style={{ padding: "1.5rem", height: "100%", width: "244px" }}>
+                <Paper elevation={3} sx={{ padding: 3, height: "100%", minHeight: 400 }}>
                   <Typography variant="h6" gutterBottom>
                     Add Expense
                   </Typography>
@@ -29,7 +29,7 @@ const App: React.FC = () => {
 
               {/* List Tile */}
               <Grid size={{ xs: 12, md: 8 }}>
-                <Paper elevation={3} style={{ padding: "1.5rem", height: "100%", width: "632px" }}>
+                <Paper elevation={3} sx={{ padding: 3, height: "100%", minHeight: 400 }}>
                   <Typography variant="h6" gutterBottom>
                     Expenses
                   </Typography>
@@ -40,7 +40,7 @@ const App: React.FC = () => {
           </Grid>
 
           {/* Row 2: Summary */}
-          <Grid size={12} style={{ marginTop: "24px" }}>
+          <Grid size={12}>
             <SummaryGrid />
           </Grid>
         </Grid>

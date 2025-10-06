@@ -102,31 +102,31 @@ const SummaryGrid: React.FC = () => {
 
   return (
     <Grid container spacing={3}>
-      {/* Left column matches form width (md=4) */}
+      {/* Left column - Daily Costs */}
       <Grid size={{ xs: 12, md: 4 }}>
-        <Paper elevation={3} style={{ padding: "1.5rem", height: "400px", width: "244px" }}>
+        <Paper elevation={3} sx={{ padding: 3, height: 400, display: 'flex', flexDirection: 'column' }}>
           <PieSection title="Daily Costs (Current Week)" data={data.dailyData} color="#8884d8" />
-          <Typography align="center" variant="subtitle1">
+          <Typography align="center" variant="subtitle1" sx={{ mt: 2 }}>
             Weekly Total: {data.weeklyTotal.toFixed(2)} {data.weeklyCurrency}
           </Typography>
         </Paper>
       </Grid>
 
-      {/* Right column matches list width (md=8), stack two tiles */}
+      {/* Right column - Weekly and Monthly Costs */}
       <Grid size={{ xs: 12, md: 8 }}>
         <Grid container spacing={3}>
           <Grid size={12}>
-            <Paper elevation={3} style={{ padding: "1.5rem", height: "400px", width: "280px" }}>
+            <Paper elevation={3} sx={{ padding: 3, height: 400, display: 'flex', flexDirection: 'column' }}>
               <PieSection title="Weekly Costs (Current Month)" data={data.weeklyData} color="#82ca9d" />
-              <Typography align="center" variant="subtitle1">
+              <Typography align="center" variant="subtitle1" sx={{ mt: 2 }}>
                 Monthly Total: {data.monthlyTotal.toFixed(2)} {data.monthlyCurrency}
               </Typography>
             </Paper>
           </Grid>
           <Grid size={12}>
-            <Paper elevation={3} style={{ padding: "1.5rem", height: "400px", width: "280px" }}>
+            <Paper elevation={3} sx={{ padding: 3, height: 400, display: 'flex', flexDirection: 'column' }}>
               <PieSection title="Monthly Costs (Current Year)" data={data.monthlyData} color="#FF8042" />
-              <Typography align="center" variant="subtitle1">
+              <Typography align="center" variant="subtitle1" sx={{ mt: 2 }}>
                 Yearly Total: {data.yearlyTotal.toFixed(2)} {data.yearlyCurrency}
               </Typography>
             </Paper>
