@@ -1,5 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
+import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import TimePeriodSelector from '../../../components/summary/TimePeriodSelector';
 
 // Mock dayjs
@@ -7,15 +9,38 @@ vi.mock('dayjs', () => {
   const mockDayjs = vi.fn((date?: string) => ({
     toISOString: () => date || '2025-01-01T00:00:00.000Z',
     format: () => date || '2025-01-01',
+    isValid: () => true,
     startOf: vi.fn((unit: string) => ({
       toISOString: () => {
         if (unit === 'month') return '2025-01-01T00:00:00.000Z';
         if (unit === 'year') return '2025-01-01T00:00:00.000Z';
+        if (unit === 'week') return '2024-12-30T00:00:00.000Z'; // Sunday before Monday
         return '2025-01-01T00:00:00.000Z';
-      }
+      },
+      add: vi.fn((amount: number, unit: string) => ({
+        toISOString: () => {
+          if (unit === 'day' && amount === 1) return '2025-01-01T00:00:00.000Z'; // Monday
+          return '2025-01-01T00:00:00.000Z';
+        }
+      }))
+    })),
+    add: vi.fn((amount: number, unit: string) => ({
+      toISOString: () => {
+        if (unit === 'day' && amount === 1) return '2025-01-02T00:00:00.000Z';
+        return '2025-01-01T00:00:00.000Z';
+      },
+      isAfter: vi.fn(() => false),
+      subtract: vi.fn(() => ({
+        toISOString: () => '2024-12-25T00:00:00.000Z'
+      }))
+    })),
+    isAfter: vi.fn(() => false),
+    subtract: vi.fn(() => ({
+      toISOString: () => '2024-12-25T00:00:00.000Z'
     }))
   }));
-  mockDayjs.extend = vi.fn();
+  (mockDayjs as Record<string, unknown>).extend = vi.fn();
+  (mockDayjs as Record<string, unknown>).locale = vi.fn();
   return { default: mockDayjs };
 });
 
@@ -85,7 +110,27 @@ vi.mock('@mui/x-date-pickers/DatePicker', () => ({
         value={value?.format?.() || '2025-01-01'}
         onChange={(e) => {
           if (onChange && typeof onChange === 'function') {
-            onChange({ toISOString: () => e.target.value });
+            // Create a mock dayjs object with the necessary methods
+            const mockDayjs = {
+              toISOString: () => e.target.value,
+              startOf: vi.fn(() => ({
+                add: vi.fn((amount: number, unit: string) => ({
+                  toISOString: () => {
+                    if (unit === 'day' && amount === 1) return '2025-01-01T00:00:00.000Z'; // Monday
+                    return e.target.value;
+                  },
+                  isAfter: vi.fn(() => false),
+                  subtract: vi.fn(() => ({
+                    toISOString: () => '2024-12-25T00:00:00.000Z'
+                  }))
+                }))
+              })),
+              isAfter: vi.fn(() => false),
+              subtract: vi.fn(() => ({
+                toISOString: () => '2024-12-25T00:00:00.000Z'
+              }))
+            };
+            onChange(mockDayjs);
           }
         }}
         disabled={disabled as boolean}
@@ -141,7 +186,8 @@ describe('TimePeriodSelector', () => {
     render(<TimePeriodSelector {...defaultProps} />);
     const dateInput = screen.getByTestId('date-picker-input');
     fireEvent.change(dateInput, { target: { value: '2025-02-01' } });
-    expect(defaultProps.onSelect).toHaveBeenCalledWith('2025-02-01');
+    // For week picker, it should return the start of the week (Monday)
+    expect(defaultProps.onSelect).toHaveBeenCalledWith('2025-01-01T00:00:00.000Z');
   });
 
   it('should disable date picker when disabled prop is true', () => {
@@ -152,9 +198,9 @@ describe('TimePeriodSelector', () => {
     expect(dateInput).toBeDisabled();
   });
 
-  it('should render Today button for week picker type', () => {
+  it('should render Current Week button for week picker type', () => {
     render(<TimePeriodSelector {...defaultProps} pickerType="week" />);
-    expect(screen.getByText('Today')).toBeInTheDocument();
+    expect(screen.getByText('Current Week')).toBeInTheDocument();
     expect(screen.queryByText('Current Month')).not.toBeInTheDocument();
     expect(screen.queryByText('Current Year')).not.toBeInTheDocument();
   });
@@ -162,22 +208,23 @@ describe('TimePeriodSelector', () => {
   it('should render Current Month button for month picker type', () => {
     render(<TimePeriodSelector {...defaultProps} pickerType="month" />);
     expect(screen.getByText('Current Month')).toBeInTheDocument();
-    expect(screen.queryByText('Today')).not.toBeInTheDocument();
+    expect(screen.queryByText('Current Week')).not.toBeInTheDocument();
     expect(screen.queryByText('Current Year')).not.toBeInTheDocument();
   });
 
   it('should render Current Year button for year picker type', () => {
     render(<TimePeriodSelector {...defaultProps} pickerType="year" />);
     expect(screen.getByText('Current Year')).toBeInTheDocument();
-    expect(screen.queryByText('Today')).not.toBeInTheDocument();
+    expect(screen.queryByText('Current Week')).not.toBeInTheDocument();
     expect(screen.queryByText('Current Month')).not.toBeInTheDocument();
   });
 
-  it('should call onSelect when Today button is clicked', () => {
+  it('should call onSelect when Current Week button is clicked', () => {
     render(<TimePeriodSelector {...defaultProps} pickerType="week" />);
-    const todayButton = screen.getByText('Today');
-    fireEvent.click(todayButton);
-    expect(defaultProps.onSelect).toHaveBeenCalled();
+    const currentWeekButton = screen.getByText('Current Week');
+    fireEvent.click(currentWeekButton);
+    // For week picker, it should return the start of the current week (Monday)
+    expect(defaultProps.onSelect).toHaveBeenCalledWith('2025-01-01T00:00:00.000Z');
   });
 
   it('should call onSelect when Current Month button is clicked', () => {
@@ -196,8 +243,8 @@ describe('TimePeriodSelector', () => {
 
   it('should disable quick navigation buttons when disabled prop is true', () => {
     render(<TimePeriodSelector {...defaultProps} pickerType="week" disabled={true} />);
-    const todayButton = screen.getByText('Today');
-    expect(todayButton).toBeDisabled();
+    const currentWeekButton = screen.getByText('Current Week');
+    expect(currentWeekButton).toBeDisabled();
   });
 
 });

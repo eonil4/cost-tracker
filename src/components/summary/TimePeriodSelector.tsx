@@ -10,6 +10,10 @@ import 'dayjs/locale/en';
 // Extend dayjs with week plugin
 dayjs.extend(weekOfYear);
 
+// Set locale to English
+dayjs.locale('en');
+
+
 interface TimePeriodSelectorProps {
   title: string;
   currentValue: string;
@@ -25,16 +29,36 @@ const TimePeriodSelector: React.FC<TimePeriodSelectorProps> = ({
   disabled = false,
   pickerType
 }) => {
-  const currentDate = dayjs(currentValue);
+  const currentDate = dayjs(currentValue || new Date().toISOString());
+  
+  // Ensure the date is valid
+  if (!currentDate.isValid()) {
+    console.warn('Invalid date provided to TimePeriodSelector:', currentValue);
+  }
 
   const handleDateChange = (newValue: Dayjs | null) => {
     if (newValue) {
-      onSelect(newValue.toISOString());
+      if (pickerType === 'week') {
+        // For week picker, select the start of the week (Monday)
+        let startOfWeek = newValue.startOf('week').add(1, 'day'); // Monday
+        if (startOfWeek.isAfter(newValue)) {
+          startOfWeek = startOfWeek.subtract(7, 'day');
+        }
+        onSelect(startOfWeek.toISOString());
+      } else {
+        onSelect(newValue.toISOString());
+      }
     }
   };
 
   const handleTodayClick = () => {
-    onSelect(dayjs().toISOString());
+    if (pickerType === 'week') {
+      // For week picker, select the start of the current week (Monday)
+      const startOfCurrentWeek = dayjs().startOf('week').add(1, 'day'); // Monday
+      onSelect(startOfCurrentWeek.toISOString());
+    } else {
+      onSelect(dayjs().toISOString());
+    }
   };
 
   const handleCurrentMonthClick = () => {
@@ -118,11 +142,11 @@ const TimePeriodSelector: React.FC<TimePeriodSelectorProps> = ({
       {/* Quick navigation buttons */}
       <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
         <ButtonGroup size="small" variant="outlined">
-          {pickerType === 'week' && (
-            <Button onClick={handleTodayClick} disabled={disabled}>
-              Today
-            </Button>
-          )}
+                 {pickerType === 'week' && (
+                   <Button onClick={handleTodayClick} disabled={disabled}>
+                     Current Week
+                   </Button>
+                 )}
           {pickerType === 'month' && (
             <Button onClick={handleCurrentMonthClick} disabled={disabled}>
               Current Month
