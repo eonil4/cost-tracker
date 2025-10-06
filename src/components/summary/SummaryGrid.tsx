@@ -1,7 +1,7 @@
 import React, { useContext, useMemo, useCallback } from "react";
 import { ExpenseContext } from "../../context/ExpenseContext";
 import type { Expense } from "../../types";
-import { Grid, Paper, Typography, Box, Divider } from "@mui/material";
+import { Paper, Typography, Grid } from "@mui/material";
 import PieSection from "./PieSection";
 import {
   format,
@@ -103,7 +103,7 @@ const SummaryGrid: React.FC = () => {
   return (
     <Grid container spacing={3}>
       {/* Left column matches form width (md=4) */}
-      <Grid item xs={12} md={4}>
+      <Grid size={{ xs: 12, md: 4 }}>
         <Paper elevation={3} style={{ padding: "1.5rem", height: "400px", width: "244px" }}>
           <PieSection title="Daily Costs (Current Week)" data={data.dailyData} color="#8884d8" />
           <Typography align="center" variant="subtitle1">
@@ -113,9 +113,9 @@ const SummaryGrid: React.FC = () => {
       </Grid>
 
       {/* Right column matches list width (md=8), stack two tiles */}
-      <Grid item xs={12} md={8}>
+      <Grid size={{ xs: 12, md: 8 }}>
         <Grid container spacing={3}>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Paper elevation={3} style={{ padding: "1.5rem", height: "400px", width: "280px" }}>
               <PieSection title="Weekly Costs (Current Month)" data={data.weeklyData} color="#82ca9d" />
               <Typography align="center" variant="subtitle1">
@@ -123,7 +123,7 @@ const SummaryGrid: React.FC = () => {
               </Typography>
             </Paper>
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Paper elevation={3} style={{ padding: "1.5rem", height: "400px", width: "280px" }}>
               <PieSection title="Monthly Costs (Current Year)" data={data.monthlyData} color="#FF8042" />
               <Typography align="center" variant="subtitle1">

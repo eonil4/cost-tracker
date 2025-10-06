@@ -1,8 +1,7 @@
 import React, { useContext, useState, useMemo } from "react";
 import { ExpenseContext } from "../../context/ExpenseContext";
 import { DataGrid, type GridColDef, GridToolbar, type GridFilterOperator, type GridFilterInputValueProps } from "@mui/x-data-grid";
-import { TextField, Box, Select, MenuItem, InputLabel, FormControl, Alert, Snackbar, Autocomplete } from "@mui/material";
-import { FaTrash, FaEdit } from "react-icons/fa";
+import { TextField, Alert, Snackbar, Autocomplete } from "@mui/material";
 import type { Expense } from "../../types";
 import ActionsCell from "./ActionsCell";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";

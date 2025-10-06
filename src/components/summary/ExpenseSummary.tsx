@@ -13,7 +13,6 @@ import {
   endOfYear,
 } from "date-fns";
 import { Typography, Box, Divider } from "@mui/material";
-import { SUMMARY_COLORS } from "./colors";
 
 // Colors moved to shared SUMMARY_COLORS
 

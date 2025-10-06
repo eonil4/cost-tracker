@@ -1,12 +1,9 @@
-import React, { Suspense, lazy } from "react";
+import React from "react";
 import { ExpenseProvider } from "./context/ExpenseProvider";
 import ExpenseForm from "./components/form/ExpenseForm";
 import ExpenseList from "./components/list/ExpenseList";
-import { Container, Typography, Paper, CircularProgress, Box, Grid } from "@mui/material";
+import { Container, Typography, Paper, Grid } from "@mui/material";
 import SummaryGrid from "./components/summary/SummaryGrid";
-
-// Lazy load the heavy ExpenseSummary component
-const ExpenseSummary = lazy(() => import("./components/summary/ExpenseSummary"));
 
 
 const App: React.FC = () => {
@@ -18,10 +15,10 @@ const App: React.FC = () => {
         </Typography>
         <Grid container rowSpacing={3} columnSpacing={3}>
           {/* Row 1: Form + List */}
-          <Grid item xs={12} style={{ marginBottom: "1.5rem" }}>
+          <Grid size={12} style={{ marginBottom: "1.5rem" }}>
             <Grid container spacing={3}>
               {/* Form Tile */}
-              <Grid item xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Paper elevation={3} style={{ padding: "1.5rem", height: "100%", width: "244px" }}>
                   <Typography variant="h6" gutterBottom>
                     Add Expense
@@ -31,7 +28,7 @@ const App: React.FC = () => {
               </Grid>
 
               {/* List Tile */}
-              <Grid item xs={12} md={8}>
+              <Grid size={{ xs: 12, md: 8 }}>
                 <Paper elevation={3} style={{ padding: "1.5rem", height: "100%", width: "632px" }}>
                   <Typography variant="h6" gutterBottom>
                     Expenses
@@ -43,7 +40,7 @@ const App: React.FC = () => {
           </Grid>
 
           {/* Row 2: Summary */}
-          <Grid item xs={12} style={{ marginTop: "24px" }}>
+          <Grid size={12} style={{ marginTop: "24px" }}>
             <SummaryGrid />
           </Grid>
         </Grid>
