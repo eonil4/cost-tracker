@@ -18,6 +18,10 @@ Object.defineProperty(window, 'localStorage', {
 describe('ExpenseContext', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorageMock.getItem.mockReturnValue(null);
+    localStorageMock.setItem.mockClear();
+    localStorageMock.removeItem.mockClear();
+    localStorageMock.clear.mockClear();
   });
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -427,6 +431,151 @@ describe('ExpenseContext', () => {
       
       expect(result.current.expenses).toHaveLength(1);
       expect(result.current.expenses[0].id).toBe(1);
+    });
+  });
+
+  describe('Error handling', () => {
+    it('should handle localStorage save errors gracefully', () => {
+      // Mock localStorage.setItem to throw an error
+      const originalSetItem = localStorageMock.setItem;
+      localStorageMock.setItem.mockImplementation(() => {
+        throw new Error('Storage quota exceeded');
+      });
+
+      const { result } = renderHook(() => useExpenseContext(), { wrapper });
+      
+      const expense: Expense = {
+        id: 1,
+        description: 'Test Expense',
+        amount: 100,
+        date: '2024-01-01',
+        currency: 'USD'
+      };
+
+      // This should not throw an error even if localStorage fails
+      expect(() => {
+        result.current.addExpense(expense);
+      }).not.toThrow();
+
+      // Restore original implementation
+      localStorageMock.setItem = originalSetItem;
+    });
+
+    it('should handle invalid expense data in addExpense', () => {
+      const { result } = renderHook(() => useExpenseContext(), { wrapper });
+      
+      const invalidExpenses = [
+        null,
+        undefined,
+        { id: 'invalid', description: 'Test', amount: 100, date: '2024-01-01', currency: 'USD' },
+        { id: 1, description: '', amount: 100, date: '2024-01-01', currency: 'USD' },
+        { id: 1, description: 'Test', amount: -100, date: '2024-01-01', currency: 'USD' },
+        { id: 1, description: 'Test', amount: 0, date: '2024-01-01', currency: 'USD' },
+        { id: 1, description: '   ', amount: 100, date: '2024-01-01', currency: 'USD' }
+      ];
+
+      invalidExpenses.forEach(invalidExpense => {
+        const initialLength = result.current.expenses.length;
+        result.current.addExpense(invalidExpense as Expense);
+        // Expenses should not be added
+        expect(result.current.expenses).toHaveLength(initialLength);
+      });
+    });
+
+    it('should handle invalid expense data in updateExpense', () => {
+      const { result } = renderHook(() => useExpenseContext(), { wrapper });
+      
+      // First add a valid expense
+      const validExpense: Expense = {
+        id: 1,
+        description: 'Valid Expense',
+        amount: 100,
+        date: '2024-01-01',
+        currency: 'USD'
+      };
+      result.current.addExpense(validExpense);
+
+      const invalidUpdates = [
+        null,
+        undefined,
+        { description: '', amount: 100, date: '2024-01-01', currency: 'USD' },
+        { description: 'Test', amount: -100, date: '2024-01-01', currency: 'USD' },
+        { description: 'Test', amount: 0, date: '2024-01-01', currency: 'USD' },
+        { description: '   ', amount: 100, date: '2024-01-01', currency: 'USD' }
+      ];
+
+      invalidUpdates.forEach(invalidUpdate => {
+        const originalExpense = result.current.expenses[0];
+        result.current.updateExpense(1, invalidUpdate as Omit<Expense, 'id'>);
+        // Expense should not be updated
+        expect(result.current.expenses[0]).toEqual(originalExpense);
+      });
+    });
+
+    it('should update expense when valid data is provided', () => {
+      const { result } = renderHook(() => useExpenseContext(), { wrapper });
+      
+      // First add a valid expense
+      const validExpense: Expense = {
+        id: 1,
+        description: 'Original Expense',
+        amount: 100,
+        date: '2024-01-01',
+        currency: 'USD'
+      };
+      act(() => {
+        result.current.addExpense(validExpense);
+      });
+
+      // Update the expense
+      const updatedData = {
+        description: 'Updated Expense',
+        amount: 200,
+        date: '2024-01-02',
+        currency: 'EUR'
+      };
+      act(() => {
+        result.current.updateExpense(1, updatedData);
+      });
+
+      // Verify the expense was updated
+      expect(result.current.expenses[0]).toEqual({
+        id: 1,
+        description: 'Updated Expense',
+        amount: 200,
+        date: '2024-01-02',
+        currency: 'EUR'
+      });
+    });
+
+    it('should not update expense when ID is not found', () => {
+      const { result } = renderHook(() => useExpenseContext(), { wrapper });
+      
+      // First add a valid expense
+      const validExpense: Expense = {
+        id: 1,
+        description: 'Original Expense',
+        amount: 100,
+        date: '2024-01-01',
+        currency: 'USD'
+      };
+      act(() => {
+        result.current.addExpense(validExpense);
+      });
+
+      // Try to update non-existent expense
+      const updatedData = {
+        description: 'Updated Expense',
+        amount: 200,
+        date: '2024-01-02',
+        currency: 'EUR'
+      };
+      act(() => {
+        result.current.updateExpense(999, updatedData);
+      });
+
+      // Verify the original expense was not changed
+      expect(result.current.expenses[0]).toEqual(validExpense);
     });
   });
 });

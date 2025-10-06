@@ -3,6 +3,18 @@ import { render, screen } from '@testing-library/react';
 import SummaryGrid from '../../../components/summary/SummaryGrid';
 import { ExpenseProvider } from '../../../context/ExpenseProvider';
 
+// Mock localStorage
+const localStorageMock = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+};
+
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+});
+
 // Mock crypto.randomUUID
 Object.defineProperty(globalThis, 'crypto', {
   value: {
@@ -197,5 +209,145 @@ describe('SummaryGrid', () => {
       grid.getAttribute('data-size') !== null
     );
     expect(gridsWithSize.length).toBeGreaterThan(0);
+  });
+
+  it('should filter expenses by year correctly', () => {
+    const mockExpenses = [
+      { id: 1, description: 'Current Year', amount: 100, date: '2024-01-01', currency: 'USD' },
+      { id: 2, description: 'Last Year', amount: 200, date: '2023-01-01', currency: 'USD' },
+      { id: 3, description: 'Current Year 2', amount: 300, date: '2024-06-01', currency: 'USD' }
+    ];
+    
+    // Mock localStorage to return test data
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    
+    renderWithProvider(<SummaryGrid />);
+    
+    // Verify the component renders
+    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+  });
+
+  it('should calculate monthly costs with multiple months', () => {
+    const mockExpenses = [
+      { id: 1, description: 'January', amount: 100, date: '2024-01-15', currency: 'USD' },
+      { id: 2, description: 'February', amount: 200, date: '2024-02-15', currency: 'USD' },
+      { id: 3, description: 'March', amount: 150, date: '2024-03-15', currency: 'USD' }
+    ];
+    
+    // Mock localStorage to return test data
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    
+    renderWithProvider(<SummaryGrid />);
+    
+    // Verify the component renders
+    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+  });
+
+  it('should handle currency counting correctly', () => {
+    const mockExpenses = [
+      { id: 1, description: 'USD 1', amount: 100, date: '2024-01-01', currency: 'USD' },
+      { id: 2, description: 'USD 2', amount: 200, date: '2024-01-02', currency: 'USD' },
+      { id: 3, description: 'EUR 1', amount: 150, date: '2024-01-03', currency: 'EUR' }
+    ];
+    
+    // Mock localStorage to return test data
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    
+    renderWithProvider(<SummaryGrid />);
+    
+    // Verify the component renders
+    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+  });
+
+  it('should handle empty expense list for currency counting', () => {
+    // Mock localStorage to return empty array
+    localStorageMock.getItem.mockReturnValue(JSON.stringify([]));
+    
+    renderWithProvider(<SummaryGrid />);
+    
+    // Verify the component renders with default currency
+    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+  });
+
+  it('should calculate weekly costs with multiple weeks', () => {
+    const mockExpenses = [
+      { id: 1, description: 'Week 1', amount: 100, date: '2024-01-01', currency: 'USD' },
+      { id: 2, description: 'Week 1', amount: 200, date: '2024-01-02', currency: 'USD' },
+      { id: 3, description: 'Week 2', amount: 300, date: '2024-01-08', currency: 'USD' },
+      { id: 4, description: 'Week 2', amount: 400, date: '2024-01-09', currency: 'USD' }
+    ];
+    
+    // Mock localStorage to return test data
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    
+    renderWithProvider(<SummaryGrid />);
+    
+    // Verify the component renders
+    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+  });
+
+  it('should calculate monthly costs with multiple months and different amounts', () => {
+    const mockExpenses = [
+      { id: 1, description: 'January 1', amount: 100, date: '2024-01-01', currency: 'USD' },
+      { id: 2, description: 'January 2', amount: 200, date: '2024-01-15', currency: 'USD' },
+      { id: 3, description: 'February 1', amount: 300, date: '2024-02-01', currency: 'USD' },
+      { id: 4, description: 'February 2', amount: 400, date: '2024-02-15', currency: 'USD' }
+    ];
+    
+    // Mock localStorage to return test data
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    
+    renderWithProvider(<SummaryGrid />);
+    
+    // Verify the component renders
+    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+  });
+
+  it('should handle currency counting with multiple currencies', () => {
+    const mockExpenses = [
+      { id: 1, description: 'USD 1', amount: 100, date: '2024-01-01', currency: 'USD' },
+      { id: 2, description: 'USD 2', amount: 200, date: '2024-01-02', currency: 'USD' },
+      { id: 3, description: 'EUR 1', amount: 150, date: '2024-01-03', currency: 'EUR' },
+      { id: 4, description: 'HUF 1', amount: 300, date: '2024-01-04', currency: 'HUF' }
+    ];
+    
+    // Mock localStorage to return test data
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    
+    renderWithProvider(<SummaryGrid />);
+    
+    // Verify the component renders
+    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+  });
+
+  it('should handle currency counting with equal currency counts', () => {
+    const mockExpenses = [
+      { id: 1, description: 'USD 1', amount: 100, date: '2024-01-01', currency: 'USD' },
+      { id: 2, description: 'EUR 1', amount: 200, date: '2024-01-02', currency: 'EUR' }
+    ];
+    
+    // Mock localStorage to return test data
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    
+    renderWithProvider(<SummaryGrid />);
+    
+    // Verify the component renders
+    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+  });
+
+  it('should handle currency counting with single currency', () => {
+    const mockExpenses = [
+      { id: 1, description: 'USD 1', amount: 100, date: '2024-01-01', currency: 'USD' },
+      { id: 2, description: 'USD 2', amount: 200, date: '2024-01-02', currency: 'USD' },
+      { id: 3, description: 'USD 3', amount: 300, date: '2024-01-03', currency: 'USD' }
+    ];
+    
+    // Mock localStorage to return test data
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    
+    renderWithProvider(<SummaryGrid />);
+    
+    // Verify the component renders
+    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
   });
 });

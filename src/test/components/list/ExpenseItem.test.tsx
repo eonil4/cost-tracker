@@ -179,4 +179,11 @@ describe('ExpenseItem', () => {
     // Button should still be present and functional
     expect(deleteButton).toBeInTheDocument();
   });
+
+  it('should throw error when context is not available', () => {
+    // Render without ExpenseProvider to test context error
+    expect(() => {
+      render(<ExpenseItem expense={mockExpense} />);
+    }).toThrow('ExpenseContext is not available');
+  });
 });

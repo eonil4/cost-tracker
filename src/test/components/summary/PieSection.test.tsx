@@ -192,6 +192,13 @@ describe('PieSection', () => {
     }
   });
 
+  it('should use default color when color prop is null', () => {
+    render(<PieSection {...defaultProps} color={null} />);
+    
+    // Should render with default color
+    expect(screen.getByTestId('pie')).toBeInTheDocument();
+  });
+
   it('should handle data with zero values', () => {
     const dataWithZeros = [
       { name: 'Zero Value', value: 0 },

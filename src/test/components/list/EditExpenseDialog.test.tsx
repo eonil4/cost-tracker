@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import EditExpenseDialog from '../../../components/list/EditExpenseDialog';
+import { ExpenseProvider } from '../../../context/ExpenseProvider';
 
 // Mock Material-UI components
 vi.mock('@mui/material', () => ({
@@ -61,6 +62,14 @@ describe('EditExpenseDialog', () => {
 
   const mockOnClose = vi.fn();
   const mockOnSubmit = vi.fn();
+
+  const renderWithProvider = (component: React.ReactElement) => {
+    return render(
+      <ExpenseProvider>
+        {component}
+      </ExpenseProvider>
+    );
+  };
   const mockSetEditDescription = vi.fn();
   const mockSetEditAmount = vi.fn();
   const mockSetEditDate = vi.fn();
@@ -249,5 +258,61 @@ describe('EditExpenseDialog', () => {
     fireEvent.click(saveButton);
     
     expect(mockOnSubmit).toHaveBeenCalledTimes(3);
+  });
+
+  it('should handle autocomplete onChange with non-string value', async () => {
+    const user = userEvent.setup();
+    const mockExpense = {
+      id: 1,
+      description: 'Test Expense',
+      amount: 100,
+      date: '2024-01-01',
+      currency: 'USD'
+    };
+
+    renderWithProvider(
+      <EditExpenseDialog
+        open={true}
+        expense={mockExpense}
+        onClose={mockOnClose}
+        onSubmit={mockOnSubmit}
+        validCurrencies={['USD', 'EUR']}
+        uniqueDescriptions={['Test Expense', 'Another Expense']}
+      />
+    );
+
+    const autocompleteInput = screen.getByTestId('autocomplete-input');
+    
+    // Type in the autocomplete input
+    await user.type(autocompleteInput, 'New Description');
+    
+    // Verify the input value changed
+    expect(autocompleteInput).toHaveValue('New Description');
+  });
+
+  it('should render autocomplete with proper renderInput function', () => {
+    const mockExpense = {
+      id: 1,
+      description: 'Test Expense',
+      amount: 100,
+      date: '2024-01-01',
+      currency: 'USD'
+    };
+
+    renderWithProvider(
+      <EditExpenseDialog
+        open={true}
+        expense={mockExpense}
+        onClose={mockOnClose}
+        onSubmit={mockOnSubmit}
+        validCurrencies={['USD', 'EUR']}
+        uniqueDescriptions={['Test Expense', 'Another Expense']}
+      />
+    );
+
+    const autocompleteInput = screen.getByTestId('autocomplete-input');
+    
+    // Verify the autocomplete input is rendered with proper props
+    expect(autocompleteInput).toBeInTheDocument();
   });
 });

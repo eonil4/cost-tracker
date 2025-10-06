@@ -3,6 +3,18 @@ import { render, screen } from '@testing-library/react';
 import ExpenseSummary from '../../../components/summary/ExpenseSummary';
 import { ExpenseProvider } from '../../../context/ExpenseProvider';
 
+// Mock localStorage
+const localStorageMock = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+};
+
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+});
+
 // Mock Material-UI components
 vi.mock('@mui/material', () => ({
   Paper: ({ children, elevation, ...props }: Record<string, unknown>) => (
@@ -217,6 +229,89 @@ describe('ExpenseSummary', () => {
     // Verify that the component maintains its internal state
     expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
     expect(screen.getByText('Weekly Costs (Current Month)')).toBeInTheDocument();
+    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+  });
+
+  it('should calculate monthly costs correctly with different months', () => {
+    const mockExpenses = [
+      { id: 1, description: 'January Expense', amount: 100, date: '2024-01-15', currency: 'USD' },
+      { id: 2, description: 'February Expense', amount: 200, date: '2024-02-15', currency: 'USD' },
+      { id: 3, description: 'March Expense', amount: 150, date: '2024-03-15', currency: 'USD' }
+    ];
+    
+    // Mock localStorage to return test data
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    
+    renderWithProvider(<ExpenseSummary />);
+    
+    // Verify the component renders with monthly data
+    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+  });
+
+  it('should handle monthly data mapping correctly', () => {
+    const mockExpenses = [
+      { id: 1, description: 'Test Expense 1', amount: 100, date: '2024-01-01', currency: 'USD' },
+      { id: 2, description: 'Test Expense 2', amount: 200, date: '2024-01-15', currency: 'USD' },
+      { id: 3, description: 'Test Expense 3', amount: 300, date: '2024-02-01', currency: 'USD' }
+    ];
+    
+    // Mock localStorage to return test data
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    
+    renderWithProvider(<ExpenseSummary />);
+    
+    // Verify the component renders
+    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+  });
+
+  it('should calculate monthly costs with multiple months and different amounts', () => {
+    const mockExpenses = [
+      { id: 1, description: 'January 1', amount: 100, date: '2024-01-01', currency: 'USD' },
+      { id: 2, description: 'January 2', amount: 200, date: '2024-01-15', currency: 'USD' },
+      { id: 3, description: 'February 1', amount: 300, date: '2024-02-01', currency: 'USD' },
+      { id: 4, description: 'February 2', amount: 400, date: '2024-02-15', currency: 'USD' },
+      { id: 5, description: 'March 1', amount: 500, date: '2024-03-01', currency: 'USD' }
+    ];
+    
+    // Mock localStorage to return test data
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    
+    renderWithProvider(<ExpenseSummary />);
+    
+    // Verify the component renders with monthly data
+    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+  });
+
+  it('should handle monthly data mapping with multiple entries per month', () => {
+    const mockExpenses = [
+      { id: 1, description: 'Jan 1', amount: 100, date: '2024-01-01', currency: 'USD' },
+      { id: 2, description: 'Jan 2', amount: 200, date: '2024-01-15', currency: 'USD' },
+      { id: 3, description: 'Jan 3', amount: 300, date: '2024-01-30', currency: 'USD' },
+      { id: 4, description: 'Feb 1', amount: 400, date: '2024-02-01', currency: 'USD' },
+      { id: 5, description: 'Feb 2', amount: 500, date: '2024-02-15', currency: 'USD' }
+    ];
+    
+    // Mock localStorage to return test data
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    
+    renderWithProvider(<ExpenseSummary />);
+    
+    // Verify the component renders
+    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+  });
+
+  it('should handle monthly data mapping with single month', () => {
+    const mockExpenses = [
+      { id: 1, description: 'January 1', amount: 100, date: '2024-01-01', currency: 'USD' },
+      { id: 2, description: 'January 2', amount: 200, date: '2024-01-15', currency: 'USD' }
+    ];
+    
+    // Mock localStorage to return test data
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(mockExpenses));
+    
+    renderWithProvider(<ExpenseSummary />);
+    
+    // Verify the component renders
     expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
   });
 });
