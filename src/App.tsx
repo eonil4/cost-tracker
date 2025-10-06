@@ -15,10 +15,10 @@ const App: React.FC = () => {
         </Typography>
         <Grid container spacing={3}>
           {/* Row 1: Form + List */}
-          <Grid size={12}>
-            <Grid container spacing={3}>
+          <Grid size={12} sx={{ mb: { xs: 3, sm: 4, md: 5 } }}>
+            <Grid container spacing={{ xs: 0, md: 3 }}>
               {/* Form Tile */}
-              <Grid size={{ xs: 12, md: 4 }}>
+              <Grid size={{ xs: 12, md: 4 }} sx={{ mb: { xs: 3, md: 0 } }}>
                 <Paper elevation={3} sx={{ padding: 3, height: "100%", minHeight: 400 }}>
                   <Typography variant="h6" gutterBottom>
                     Add Expense
@@ -40,7 +40,7 @@ const App: React.FC = () => {
           </Grid>
 
           {/* Row 2: Summary */}
-          <Grid size={12}>
+          <Grid size={12} sx={{ mt: { xs: 1, sm: 2 } }}>
             <SummaryGrid />
           </Grid>
         </Grid>

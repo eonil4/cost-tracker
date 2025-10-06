@@ -101,9 +101,9 @@ const SummaryGrid: React.FC = () => {
   }, [expenses, parseDate]);
 
   return (
-    <Grid container spacing={3}>
-      {/* Left column - Daily Costs */}
-      <Grid size={{ xs: 12, md: 4 }}>
+    <Grid container spacing={{ xs: 0, md: 3 }}>
+      {/* Daily Costs */}
+      <Grid size={{ xs: 12, md: 4 }} sx={{ mb: { xs: 3, md: 0 } }}>
         <Paper elevation={3} sx={{ padding: 3, height: 400, display: 'flex', flexDirection: 'column' }}>
           <PieSection title="Daily Costs (Current Week)" data={data.dailyData} color="#8884d8" />
           <Typography align="center" variant="subtitle1" sx={{ mt: 2 }}>
@@ -112,26 +112,24 @@ const SummaryGrid: React.FC = () => {
         </Paper>
       </Grid>
 
-      {/* Right column - Weekly and Monthly Costs */}
-      <Grid size={{ xs: 12, md: 8 }}>
-        <Grid container spacing={3}>
-          <Grid size={12}>
-            <Paper elevation={3} sx={{ padding: 3, height: 400, display: 'flex', flexDirection: 'column' }}>
-              <PieSection title="Weekly Costs (Current Month)" data={data.weeklyData} color="#82ca9d" />
-              <Typography align="center" variant="subtitle1" sx={{ mt: 2 }}>
-                Monthly Total: {data.monthlyTotal.toFixed(2)} {data.monthlyCurrency}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid size={12}>
-            <Paper elevation={3} sx={{ padding: 3, height: 400, display: 'flex', flexDirection: 'column' }}>
-              <PieSection title="Monthly Costs (Current Year)" data={data.monthlyData} color="#FF8042" />
-              <Typography align="center" variant="subtitle1" sx={{ mt: 2 }}>
-                Yearly Total: {data.yearlyTotal.toFixed(2)} {data.yearlyCurrency}
-              </Typography>
-            </Paper>
-          </Grid>
-        </Grid>
+      {/* Weekly Costs */}
+      <Grid size={{ xs: 12, md: 4 }} sx={{ mb: { xs: 3, md: 0 } }}>
+        <Paper elevation={3} sx={{ padding: 3, height: 400, display: 'flex', flexDirection: 'column' }}>
+          <PieSection title="Weekly Costs (Current Month)" data={data.weeklyData} color="#82ca9d" />
+          <Typography align="center" variant="subtitle1" sx={{ mt: 2 }}>
+            Monthly Total: {data.monthlyTotal.toFixed(2)} {data.monthlyCurrency}
+          </Typography>
+        </Paper>
+      </Grid>
+
+      {/* Monthly Costs */}
+      <Grid size={{ xs: 12, md: 4 }} sx={{ mb: { xs: 3, md: 0 } }}>
+        <Paper elevation={3} sx={{ padding: 3, height: 400, display: 'flex', flexDirection: 'column' }}>
+          <PieSection title="Monthly Costs (Current Year)" data={data.monthlyData} color="#FF8042" />
+          <Typography align="center" variant="subtitle1" sx={{ mt: 2 }}>
+            Yearly Total: {data.yearlyTotal.toFixed(2)} {data.yearlyCurrency}
+          </Typography>
+        </Paper>
       </Grid>
     </Grid>
   );
