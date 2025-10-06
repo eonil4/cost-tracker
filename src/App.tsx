@@ -1,30 +1,49 @@
-import React, { Suspense, lazy } from "react";
+import React from "react";
 import { ExpenseProvider } from "./context/ExpenseProvider";
-import ExpenseForm from "./components/ExpenseForm";
-import ExpenseList from "./components/ExpenseList";
-import { Container, Typography, Paper, CircularProgress, Box } from "@mui/material";
+import ExpenseForm from "./components/form/ExpenseForm";
+import ExpenseList from "./components/list/ExpenseList";
+import { Container, Typography, Paper, Grid } from "@mui/material";
+import SummaryGrid from "./components/summary/SummaryGrid";
 
-// Lazy load the heavy ExpenseSummary component
-const ExpenseSummary = lazy(() => import("./components/ExpenseSummary"));
 
 const App: React.FC = () => {
   return (
     <ExpenseProvider>
-      <Container maxWidth="md" style={{ marginTop: "2rem" }}>
-        <Paper elevation={3} style={{ padding: "2rem" }}>
-          <Typography variant="h4" align="center" gutterBottom>
-            Cost Tracker
-          </Typography>
-          <ExpenseForm />
-          <ExpenseList />
-          <Suspense fallback={
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-              <CircularProgress />
-            </Box>
-          }>
-            <ExpenseSummary />
-          </Suspense>
-        </Paper>
+      <Container maxWidth="xl" sx={{ marginTop: 3, marginBottom: 3, px: { xs: 2, sm: 3, md: 4 } }}>
+        <Typography variant="h4" align="center" gutterBottom sx={{ mb: 4 }}>
+          Cost Tracker
+        </Typography>
+        <Grid container spacing={3}>
+          {/* Row 1: Form + List */}
+          <Grid size={12} sx={{ mb: { xs: 3, sm: 4, md: 5 } }}>
+            <Grid container spacing={{ xs: 0, md: 3 }}>
+              {/* Form Tile */}
+              <Grid size={{ xs: 12, md: 4 }} sx={{ mb: { xs: 3, md: 0 } }}>
+                <Paper elevation={3} sx={{ padding: 3, height: "100%", minHeight: 400 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Add Expense
+                  </Typography>
+                  <ExpenseForm />
+                </Paper>
+              </Grid>
+
+              {/* List Tile */}
+              <Grid size={{ xs: 12, md: 8 }}>
+                <Paper elevation={3} sx={{ padding: 3, height: "100%", minHeight: 400 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Expenses
+                  </Typography>
+                  <ExpenseList />
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          {/* Row 2: Summary */}
+          <Grid size={12} sx={{ mt: { xs: 1, sm: 2 } }}>
+            <SummaryGrid />
+          </Grid>
+        </Grid>
       </Container>
     </ExpenseProvider>
   );

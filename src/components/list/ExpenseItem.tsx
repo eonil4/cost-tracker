@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
-import type { Expense } from "../types";
-import { ExpenseContext } from "../context/ExpenseContext";
+import type { Expense } from "../../types";
+import { ExpenseContext } from "../../context/ExpenseContext";
 import { ListItem, ListItemText, ListItemSecondaryAction, IconButton } from "@mui/material";
 import { FaTrash } from "react-icons/fa";
 
@@ -30,3 +30,5 @@ const ExpenseItem: React.FC<ExpenseItemProps> = ({ expense }) => {
 };
 
 export default ExpenseItem;
+
+
