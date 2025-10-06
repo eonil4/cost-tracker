@@ -1,4 +1,4 @@
-import { format, parseISO, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
+import { format, parseISO, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import type { Expense } from '../types';
 
 /**
@@ -91,4 +91,113 @@ export const countCurrencies = (expenses: Expense[]): Record<string, number> => 
     acc[expense.currency] = (acc[expense.currency] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
+};
+
+/**
+ * Calculates daily costs for a specific week
+ * @param expenses - Array of expenses
+ * @param weekStart - Start date of the week
+ * @returns Object with daily costs for the specified week
+ */
+export const calculateDailyCostsForWeek = (expenses: Expense[], weekStart: Date): Record<string, number> => {
+  const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+  
+  return expenses.reduce((acc, expense) => {
+    const expenseDate = parseISO(expense.date);
+    if (isWithinInterval(expenseDate, { start: weekStart, end: weekEnd })) {
+      const dayName = format(expenseDate, 'EEEE');
+      acc[dayName] = (acc[dayName] || 0) + expense.amount;
+    }
+    return acc;
+  }, {} as Record<string, number>);
+};
+
+/**
+ * Calculates weekly costs for a specific month
+ * @param expenses - Array of expenses
+ * @param monthStart - Start date of the month
+ * @returns Object with weekly costs for the specified month
+ */
+export const calculateWeeklyCostsForMonth = (expenses: Expense[], monthStart: Date): Record<string, number> => {
+  const monthEnd = endOfMonth(monthStart);
+  
+  return expenses.reduce((acc, expense) => {
+    const expenseDate = parseISO(expense.date);
+    if (isWithinInterval(expenseDate, { start: monthStart, end: monthEnd })) {
+      const weekStart = startOfWeek(expenseDate, { weekStartsOn: 1 });
+      const weekKey = format(weekStart, 'MMM dd');
+      acc[weekKey] = (acc[weekKey] || 0) + expense.amount;
+    }
+    return acc;
+  }, {} as Record<string, number>);
+};
+
+/**
+ * Calculates monthly costs for a specific year
+ * @param expenses - Array of expenses
+ * @param year - Year to calculate for
+ * @returns Object with monthly costs for the specified year
+ */
+export const calculateMonthlyCostsForYear = (expenses: Expense[], year: number): Record<string, number> => {
+  const yearStart = new Date(year, 0, 1);
+  const yearEnd = new Date(year, 11, 31);
+  
+  return expenses.reduce((acc, expense) => {
+    const expenseDate = parseISO(expense.date);
+    if (isWithinInterval(expenseDate, { start: yearStart, end: yearEnd })) {
+      const month = format(expenseDate, "MMMM");
+      acc[month] = (acc[month] || 0) + expense.amount;
+    }
+    return acc;
+  }, {} as Record<string, number>);
+};
+
+/**
+ * Gets all weeks that have expense data
+ * @param expenses - Array of expenses
+ * @returns Array of week start dates that have data
+ */
+export const getWeeksWithData = (expenses: Expense[]): Date[] => {
+  const weekSet = new Set<string>();
+  
+  expenses.forEach(expense => {
+    const expenseDate = parseISO(expense.date);
+    const weekStart = startOfWeek(expenseDate, { weekStartsOn: 1 });
+    weekSet.add(weekStart.toISOString());
+  });
+  
+  return Array.from(weekSet).map(dateStr => new Date(dateStr)).sort((a, b) => b.getTime() - a.getTime());
+};
+
+/**
+ * Gets all months that have expense data
+ * @param expenses - Array of expenses
+ * @returns Array of month start dates that have data
+ */
+export const getMonthsWithData = (expenses: Expense[]): Date[] => {
+  const monthSet = new Set<string>();
+  
+  expenses.forEach(expense => {
+    const expenseDate = parseISO(expense.date);
+    const monthStart = startOfMonth(expenseDate);
+    monthSet.add(monthStart.toISOString());
+  });
+  
+  return Array.from(monthSet).map(dateStr => new Date(dateStr)).sort((a, b) => b.getTime() - a.getTime());
+};
+
+/**
+ * Gets all years that have expense data
+ * @param expenses - Array of expenses
+ * @returns Array of years that have data
+ */
+export const getYearsWithData = (expenses: Expense[]): number[] => {
+  const yearSet = new Set<number>();
+  
+  expenses.forEach(expense => {
+    const expenseDate = parseISO(expense.date);
+    yearSet.add(expenseDate.getFullYear());
+  });
+  
+  return Array.from(yearSet).sort((a, b) => b - a);
 };

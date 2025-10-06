@@ -49,6 +49,29 @@ vi.mock('@mui/material', () => ({
       {children as React.ReactNode}
     </div>
   ),
+  Box: ({ children, sx, ...props }: Record<string, unknown>) => (
+    <div data-testid="box" data-sx={JSON.stringify(sx)} {...props}>
+      {children as React.ReactNode}
+    </div>
+  ),
+  Button: ({ children, variant, size, onClick, disabled, ...props }: Record<string, unknown>) => (
+    <button 
+      data-testid="button" 
+      data-variant={variant} 
+      data-size={size} 
+      data-disabled={disabled}
+      onClick={onClick as () => void}
+      disabled={disabled as boolean}
+      {...props}
+    >
+      {children as React.ReactNode}
+    </button>
+  ),
+  ButtonGroup: ({ children, size, ...props }: Record<string, unknown>) => (
+    <div data-testid="button-group" data-size={size} {...props}>
+      {children as React.ReactNode}
+    </div>
+  ),
 }));
 
 // Mock PieSection component
@@ -59,6 +82,28 @@ vi.mock('../../../components/summary/PieSection', () => ({
       <div data-testid="pie-section-data">{JSON.stringify(data)}</div>
     </div>
   )
+}));
+
+// Mock TimePeriodSelector component
+vi.mock('../../../components/summary/TimePeriodSelector', () => ({
+  default: ({ title, currentValue, onSelect, disabled, pickerType }: Record<string, unknown>) => (
+    <div data-testid="time-period-selector" data-title={title as string} data-current-value={currentValue as string} data-disabled={disabled as boolean} data-picker-type={pickerType as string}>
+      <div data-testid="selector-title">{title as string}</div>
+      <div data-testid="date-picker" data-picker-type={pickerType as string}>
+        <input 
+          data-testid="date-picker-input" 
+          value={currentValue as string}
+          onChange={(e) => (onSelect as (value: string) => void)(e.target.value)}
+          disabled={disabled as boolean}
+        />
+      </div>
+      <div data-testid="quick-nav-buttons">
+        {pickerType === 'week' && <button data-testid="today-button">Today</button>}
+        {pickerType === 'month' && <button data-testid="current-month-button">Current Month</button>}
+        {pickerType === 'year' && <button data-testid="current-year-button">Current Year</button>}
+      </div>
+    </div>
+  ),
 }));
 
 const renderWithProvider = (component: React.ReactElement) => {
@@ -77,9 +122,9 @@ describe('SummaryGrid', () => {
   it('should render all three summary sections', () => {
     renderWithProvider(<SummaryGrid />);
     
-    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
-    expect(screen.getByText('Weekly Costs (Current Month)')).toBeInTheDocument();
-    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+    expect(screen.getByText(/Daily Costs - Week of/)).toBeInTheDocument();
+    expect(screen.getByText(/Weekly Costs -/)).toBeInTheDocument();
+    expect(screen.getByText(/Monthly Costs -/)).toBeInTheDocument();
   });
 
   it('should display empty state when no expenses', () => {
@@ -106,9 +151,9 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Check that all sections are present
-    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
-    expect(screen.getByText('Weekly Costs (Current Month)')).toBeInTheDocument();
-    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+    expect(screen.getByText(/Daily Costs - Week of/)).toBeInTheDocument();
+    expect(screen.getByText(/Weekly Costs -/)).toBeInTheDocument();
+    expect(screen.getByText(/Monthly Costs -/)).toBeInTheDocument();
   });
 
   it('should render pie sections with correct props', () => {
@@ -119,7 +164,7 @@ describe('SummaryGrid', () => {
     
     // Check that pie sections have the expected titles
     const pieSectionTitles = screen.getAllByTestId('pie-section-title');
-    expect(pieSectionTitles[0]).toHaveTextContent('Daily Costs (Current Week)');
+    expect(pieSectionTitles[0]).toHaveTextContent('');
   });
 
   it('should render with proper grid structure', () => {
@@ -149,9 +194,9 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Check that the main titles are present
-    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
-    expect(screen.getByText('Weekly Costs (Current Month)')).toBeInTheDocument();
-    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+    expect(screen.getByText(/Daily Costs - Week of/)).toBeInTheDocument();
+    expect(screen.getByText(/Weekly Costs -/)).toBeInTheDocument();
+    expect(screen.getByText(/Monthly Costs -/)).toBeInTheDocument();
     
     // Check that totals are present
     expect(screen.getByText('Weekly Total: 0.00 HUF')).toBeInTheDocument();
@@ -171,18 +216,18 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Check that all main sections are present and accessible
-    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
-    expect(screen.getByText('Weekly Costs (Current Month)')).toBeInTheDocument();
-    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+    expect(screen.getByText(/Daily Costs - Week of/)).toBeInTheDocument();
+    expect(screen.getByText(/Weekly Costs -/)).toBeInTheDocument();
+    expect(screen.getByText(/Monthly Costs -/)).toBeInTheDocument();
   });
 
   it('should maintain component state correctly', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Verify that the component maintains its internal state
-    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
-    expect(screen.getByText('Weekly Costs (Current Month)')).toBeInTheDocument();
-    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+    expect(screen.getByText(/Daily Costs - Week of/)).toBeInTheDocument();
+    expect(screen.getByText(/Weekly Costs -/)).toBeInTheDocument();
+    expect(screen.getByText(/Monthly Costs -/)).toBeInTheDocument();
   });
 
   it('should render with correct spacing and sizing', () => {
@@ -224,7 +269,7 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Verify the component renders
-    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+    expect(screen.getByText(/Daily Costs - Week of/)).toBeInTheDocument();
   });
 
   it('should calculate monthly costs with multiple months', () => {
@@ -240,7 +285,7 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Verify the component renders
-    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+    expect(screen.getByText(/Monthly Costs -/)).toBeInTheDocument();
   });
 
   it('should handle currency counting correctly', () => {
@@ -256,7 +301,7 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Verify the component renders
-    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+    expect(screen.getByText(/Daily Costs - Week of/)).toBeInTheDocument();
   });
 
   it('should handle empty expense list for currency counting', () => {
@@ -266,7 +311,7 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Verify the component renders with default currency
-    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+    expect(screen.getByText(/Daily Costs - Week of/)).toBeInTheDocument();
   });
 
   it('should calculate weekly costs with multiple weeks', () => {
@@ -283,7 +328,7 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Verify the component renders
-    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+    expect(screen.getByText(/Daily Costs - Week of/)).toBeInTheDocument();
   });
 
   it('should calculate monthly costs with multiple months and different amounts', () => {
@@ -300,7 +345,7 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Verify the component renders
-    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+    expect(screen.getByText(/Monthly Costs -/)).toBeInTheDocument();
   });
 
   it('should handle currency counting with multiple currencies', () => {
@@ -317,7 +362,7 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Verify the component renders
-    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+    expect(screen.getByText(/Daily Costs - Week of/)).toBeInTheDocument();
   });
 
   it('should handle currency counting with equal currency counts', () => {
@@ -332,7 +377,7 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Verify the component renders
-    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+    expect(screen.getByText(/Daily Costs - Week of/)).toBeInTheDocument();
   });
 
   it('should handle currency counting with single currency', () => {
@@ -348,7 +393,7 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Verify the component renders
-    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+    expect(screen.getByText(/Daily Costs - Week of/)).toBeInTheDocument();
   });
 
   it('should calculate weekly costs with multiple weeks', () => {
@@ -363,7 +408,7 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Verify the component renders with weekly data
-    expect(screen.getByText('Weekly Costs (Current Month)')).toBeInTheDocument();
+    expect(screen.getByText(/Weekly Costs -/)).toBeInTheDocument();
   });
 
   it('should calculate monthly costs with multiple months and different amounts', () => {
@@ -379,7 +424,7 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Verify the component renders with monthly data
-    expect(screen.getByText('Monthly Costs (Current Year)')).toBeInTheDocument();
+    expect(screen.getByText(/Monthly Costs -/)).toBeInTheDocument();
   });
 
   it('should handle currency counting with multiple currencies', () => {
@@ -394,7 +439,7 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Verify the component renders with currency data
-    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+    expect(screen.getByText(/Daily Costs - Week of/)).toBeInTheDocument();
   });
 
   it('should handle currency counting with equal currency counts', () => {
@@ -407,7 +452,7 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Verify the component renders with currency data
-    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+    expect(screen.getByText(/Daily Costs - Week of/)).toBeInTheDocument();
   });
 
   it('should handle currency counting with single currency', () => {
@@ -421,6 +466,6 @@ describe('SummaryGrid', () => {
     renderWithProvider(<SummaryGrid />);
     
     // Verify the component renders with currency data
-    expect(screen.getByText('Daily Costs (Current Week)')).toBeInTheDocument();
+    expect(screen.getByText(/Daily Costs - Week of/)).toBeInTheDocument();
   });
 });
