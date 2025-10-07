@@ -399,4 +399,17 @@ describe('ExpenseForm', () => {
     await user.clear(descriptionInput);
     expect(descriptionInput).toBeInTheDocument();
   });
+
+  it('should use fallback ID generation when crypto.randomUUID is not available', async () => {
+    // Mock crypto as undefined to trigger fallback
+    const originalCrypto = globalThis.crypto;
+    // @ts-expect-error - Intentionally deleting crypto to test fallback
+    delete globalThis.crypto;
+
+    // The component should render without crashing even without crypto.randomUUID
+    expect(() => renderWithProvider(<ExpenseForm />)).not.toThrow();
+
+    // Restore crypto
+    globalThis.crypto = originalCrypto;
+  });
 });

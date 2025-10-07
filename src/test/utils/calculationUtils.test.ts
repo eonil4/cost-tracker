@@ -5,7 +5,13 @@ import {
   calculateMonthlyCosts,
   convertCostsToChartData,
   calculateTotalCosts,
-  countCurrencies
+  countCurrencies,
+  calculateDailyCostsForWeek,
+  calculateWeeklyCostsForMonth,
+  calculateMonthlyCostsForYear,
+  getWeeksWithData,
+  getMonthsWithData,
+  getYearsWithData
 } from '../../utils/calculationUtils';
 import type { Expense } from '../../types';
 
@@ -199,6 +205,102 @@ describe('calculationUtils', () => {
 
       const result = countCurrencies(singleCurrencyExpenses);
       expect(result).toEqual({ 'USD': 1 });
+    });
+  });
+
+  describe('calculateDailyCostsForWeek', () => {
+    it('should calculate daily costs for a specific week', () => {
+      const weekStart = new Date('2024-01-15'); // Monday
+      const result = calculateDailyCostsForWeek(mockExpenses, weekStart);
+      
+      expect(result).toBeDefined();
+      expect(typeof result).toBe('object');
+    });
+
+    it('should return empty object when no expenses in the week', () => {
+      const weekStart = new Date('2024-12-01'); // Week with no expenses
+      const result = calculateDailyCostsForWeek(mockExpenses, weekStart);
+      
+      expect(result).toEqual({});
+    });
+  });
+
+  describe('calculateWeeklyCostsForMonth', () => {
+    it('should calculate weekly costs for a specific month', () => {
+      const monthStart = new Date('2024-01-01');
+      const result = calculateWeeklyCostsForMonth(mockExpenses, monthStart);
+      
+      expect(result).toBeDefined();
+      expect(typeof result).toBe('object');
+    });
+
+    it('should return empty object when no expenses in the month', () => {
+      const monthStart = new Date('2024-12-01');
+      const result = calculateWeeklyCostsForMonth(mockExpenses, monthStart);
+      
+      expect(result).toEqual({});
+    });
+  });
+
+  describe('calculateMonthlyCostsForYear', () => {
+    it('should calculate monthly costs for a specific year', () => {
+      const year = 2024;
+      const result = calculateMonthlyCostsForYear(mockExpenses, year);
+      
+      expect(result).toBeDefined();
+      expect(typeof result).toBe('object');
+    });
+
+    it('should return empty object when no expenses in the year', () => {
+      const year = 2020;
+      const result = calculateMonthlyCostsForYear(mockExpenses, year);
+      
+      expect(result).toEqual({});
+    });
+  });
+
+  describe('getWeeksWithData', () => {
+    it('should return weeks that have expense data', () => {
+      const result = getWeeksWithData(mockExpenses);
+      
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('should return empty array when no expenses', () => {
+      const result = getWeeksWithData([]);
+      
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('getMonthsWithData', () => {
+    it('should return months that have expense data', () => {
+      const result = getMonthsWithData(mockExpenses);
+      
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('should return empty array when no expenses', () => {
+      const result = getMonthsWithData([]);
+      
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('getYearsWithData', () => {
+    it('should return years that have expense data', () => {
+      const result = getYearsWithData(mockExpenses);
+      
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('should return empty array when no expenses', () => {
+      const result = getYearsWithData([]);
+      
+      expect(result).toEqual([]);
     });
   });
 });

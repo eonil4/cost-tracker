@@ -15,6 +15,8 @@ vi.mock('@mui/material', () => ({
   Typography: ({ children, ...props }: Record<string, unknown>) => <div data-testid="typography" {...props}>{children as React.ReactNode}</div>,
   Paper: ({ children, ...props }: Record<string, unknown>) => <div data-testid="paper" {...props}>{children as React.ReactNode}</div>,
   Grid: ({ children, ...props }: Record<string, unknown>) => <div data-testid="grid" {...props}>{children as React.ReactNode}</div>,
+  Box: ({ children, ...props }: Record<string, unknown>) => <div data-testid="box" {...props}>{children as React.ReactNode}</div>,
+  CssBaseline: () => <div data-testid="css-baseline" />,
 }));
 
 // Mock child components
@@ -28,6 +30,10 @@ vi.mock('../components/list/ExpenseList', () => ({
 
 vi.mock('../components/summary/SummaryGrid', () => ({
   default: () => <div data-testid="summary-grid">SummaryGrid</div>
+}));
+
+vi.mock('../components/ThemeToggle', () => ({
+  default: () => <div data-testid="theme-toggle">ThemeToggle</div>
 }));
 
 describe('App', () => {

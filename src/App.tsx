@@ -1,18 +1,24 @@
 import React from "react";
 import { ExpenseProvider } from "./context/ExpenseProvider";
+import { ThemeProvider } from "./context/ThemeContext";
 import ExpenseForm from "./components/form/ExpenseForm";
 import ExpenseList from "./components/list/ExpenseList";
-import { Container, Typography, Paper, Grid } from "@mui/material";
+import { Container, Typography, Paper, Grid, Box } from "@mui/material";
 import SummaryGrid from "./components/summary/SummaryGrid";
+import ThemeToggle from "./components/ThemeToggle";
 
 
 const App: React.FC = () => {
   return (
-    <ExpenseProvider>
-      <Container maxWidth="xl" sx={{ marginTop: 3, marginBottom: 3, px: { xs: 2, sm: 3, md: 4 } }}>
-        <Typography variant="h4" align="center" gutterBottom sx={{ mb: 4 }}>
-          Cost Tracker
-        </Typography>
+    <ThemeProvider>
+      <ExpenseProvider>
+        <Container maxWidth="xl" sx={{ marginTop: 3, marginBottom: 3, px: { xs: 2, sm: 3, md: 4 } }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 4 }}>
+            <Typography variant="h4" align="center" sx={{ mr: 2 }}>
+              Cost Tracker
+            </Typography>
+            <ThemeToggle />
+          </Box>
         <Grid container spacing={3}>
           {/* Row 1: Form + List */}
           <Grid size={12} sx={{ mb: { xs: 3, sm: 4, md: 5 } }}>
@@ -44,8 +50,9 @@ const App: React.FC = () => {
             <SummaryGrid />
           </Grid>
         </Grid>
-      </Container>
-    </ExpenseProvider>
+        </Container>
+      </ExpenseProvider>
+    </ThemeProvider>
   );
 };
 
