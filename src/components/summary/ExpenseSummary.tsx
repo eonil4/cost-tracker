@@ -13,6 +13,11 @@ import {
   endOfYear,
 } from "date-fns";
 import { Typography, Box, Divider } from "@mui/material";
+import { 
+  calculateMonthlyCosts,
+  convertCostsToChartData,
+  calculateTotalCosts
+} from "../../utils/calculationUtils";
 
 // Colors moved to shared SUMMARY_COLORS
 
@@ -99,18 +104,10 @@ const ExpenseSummary: React.FC = () => {
       isWithinInterval(parseDate(expense.date), { start: yearStart, end: yearEnd })
     );
 
-    const monthlyCosts = expensesInCurrentYear.reduce((acc, expense) => {
-      const month = format(parseDate(expense.date), "MMMM"); // Group by month name
-      acc[month] = (acc[month] || 0) + expense.amount;
-      return acc;
-    }, {} as Record<string, number>);
+    const monthlyCosts = calculateMonthlyCosts(expensesInCurrentYear);
+    const monthlyData = convertCostsToChartData(monthlyCosts);
 
-    const monthlyData = Object.entries(monthlyCosts).map(([month, total]) => ({
-      name: month,
-      value: total,
-    }));
-
-    const yearlySummary = Object.values(monthlyCosts).reduce((sum, value) => sum + value, 0);
+    const yearlySummary = calculateTotalCosts(monthlyCosts);
 
     return {
       dailyData,

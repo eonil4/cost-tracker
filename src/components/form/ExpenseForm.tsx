@@ -12,6 +12,7 @@ import {
   Alert,
   Snackbar,
 } from "@mui/material";
+import { handleAutocompleteChange, renderAutocompleteInput } from "../../utils/autocompleteUtils";
 
 const ExpenseForm: React.FC = () => {
   const context = useContext(ExpenseContext);
@@ -29,7 +30,7 @@ const ExpenseForm: React.FC = () => {
   };
 
   // Valid currencies
-  const validCurrencies = ["HUF", "USD", "EUR", "GBP"];
+  const validCurrencies = useMemo(() => ["HUF", "USD", "EUR", "GBP"], []);
 
   // Form state
   const [description, setDescription] = useState<string>(""); // State for description
@@ -109,16 +110,8 @@ const ExpenseForm: React.FC = () => {
           inputValue={description}
           onInputChange={(_, newInputValue) => setDescription(newInputValue)}
           // Ensure selected option also updates input when user picks from list
-          onChange={(_, newValue) => {
-            if (typeof newValue === "string") {
-              setDescription(newValue);
-            } else if (newValue != null) {
-              setDescription(String(newValue));
-            }
-          }}
-          renderInput={(params) => (
-            <TextField {...params} label="Description" variant="outlined" fullWidth />
-          )}
+          onChange={(_, newValue) => handleAutocompleteChange(newValue, setDescription)}
+          renderInput={(params) => renderAutocompleteInput(params, "Description")}
         />
         {/* Amount Input */}
         <TextField

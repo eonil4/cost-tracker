@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 import type { Expense } from "../types";
 
 export interface ExpenseContextType {
@@ -11,3 +11,11 @@ export interface ExpenseContextType {
 export const ExpenseContext = createContext<ExpenseContextType | undefined>(
   undefined
 );
+
+export const useExpenseContext = (): ExpenseContextType => {
+  const context = useContext(ExpenseContext);
+  if (context === undefined) {
+    throw new Error('useExpenseContext must be used within an ExpenseProvider');
+  }
+  return context;
+};

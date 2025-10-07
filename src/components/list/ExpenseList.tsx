@@ -6,6 +6,10 @@ import type { Expense } from "../../types";
 import ActionsCell from "./ActionsCell";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import EditExpenseDialog from "./EditExpenseDialog";
+import { 
+  createCurrencyFilterOperator
+} from "../../utils/filterUtils";
+import { validateEditForm, createUpdatedExpense } from "../../utils/formValidationUtils";
 
 const ExpenseList: React.FC = () => {
   const context = useContext(ExpenseContext);
@@ -55,25 +59,6 @@ const ExpenseList: React.FC = () => {
     );
   };
 
-  // Autocomplete filter input for currency ("is")
-  const CurrencyFilterInput: React.FC<GridFilterInputValueProps> = (props) => {
-    const value = (props.item.value as string) ?? "";
-    return (
-      <Autocomplete
-        options={validCurrencies}
-        value={value}
-        ListboxProps={{
-          style: { maxHeight: 36 * 5, overflowY: "auto" },
-        }}
-        onChange={(_, newValue) =>
-          props.applyValue({ ...props.item, value: newValue ?? "" })
-        }
-        renderInput={(params) => (
-          <TextField {...params} label="Currency" inputRef={props.focusElementRef} />
-        )}
-      />
-    );
-  };
 
   const descriptionFilterOperators: GridFilterOperator[] = [
     {
@@ -90,16 +75,7 @@ const ExpenseList: React.FC = () => {
   ];
 
   const currencyFilterOperators: GridFilterOperator[] = [
-    {
-      label: "is",
-      value: "is",
-      getApplyFilterFn: (filterItem) => {
-        const filterValue = (filterItem.value ?? "").toString();
-        if (!filterValue) return null;
-        return (params) => (params.value ?? "").toString() === filterValue;
-      },
-      InputComponent: CurrencyFilterInput,
-    },
+    createCurrencyFilterOperator(validCurrencies),
   ];
 
   // Date filter input using native date selector (YYYY-MM-DD)
@@ -177,35 +153,21 @@ const ExpenseList: React.FC = () => {
   const handleEditSubmit = () => {
     if (!editingExpense) return;
 
-    // Validate form inputs
-    if (!editDescription.trim() || !editAmount || !editDate || !editCurrency) {
-      setErrorMessage("Please fill in all fields.");
-      setShowError(true);
-      return;
-    }
-
-    // Validate currency
-    if (!validCurrencies.includes(editCurrency)) {
-      setErrorMessage("Please select a valid currency.");
-      setShowError(true);
-      return;
-    }
-
-    // Validate amount is a positive number
-    const parsedAmount = parseFloat(editAmount);
-    if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      setErrorMessage("Please enter a valid positive amount.");
-      setShowError(true);
-      return;
-    }
-
-    const updatedExpense = {
-      description: editDescription.trim(),
-      amount: parsedAmount,
+    const formData = {
+      description: editDescription,
+      amount: editAmount,
       date: editDate,
       currency: editCurrency,
     };
 
+    const validation = validateEditForm(formData, validCurrencies);
+    if (!validation.isValid) {
+      setErrorMessage(validation.errorMessage || "Please fill in all fields.");
+      setShowError(true);
+      return;
+    }
+
+    const updatedExpense = createUpdatedExpense(formData);
     updateExpense(editingExpense.id, updatedExpense);
     handleCloseEditDialog();
   };

@@ -1,7 +1,7 @@
 import { Box, IconButton } from "@mui/material";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
-interface ActionsCellProps<T = any> {
+interface ActionsCellProps<T = Record<string, unknown>> {
   row: T;
   onEdit: (row: T) => void;
   onDelete: (id: number) => void;
