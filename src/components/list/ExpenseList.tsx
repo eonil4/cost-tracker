@@ -1,6 +1,13 @@
 import React, { useContext, useState, useMemo } from "react";
 import { ExpenseContext } from "../../context/ExpenseContext";
-import { DataGrid, type GridColDef, GridToolbar, type GridFilterOperator, type GridFilterInputValueProps } from "@mui/x-data-grid";
+import { 
+  DataGrid, 
+  type GridColDef, 
+  type GridFilterOperator, 
+  type GridFilterInputValueProps,
+  GridToolbarQuickFilter,
+  GridToolbarContainer 
+} from "@mui/x-data-grid";
 import { TextField, Alert, Snackbar, Autocomplete } from "@mui/material";
 import type { Expense } from "../../types";
 import ActionsCell from "./ActionsCell";
@@ -10,6 +17,18 @@ import {
   createCurrencyFilterOperator
 } from "../../utils/filterUtils";
 import { validateEditForm, createUpdatedExpense } from "../../utils/formValidationUtils";
+
+// Custom toolbar with quick filter
+const CustomToolbar = () => {
+  return (
+    <GridToolbarContainer sx={{ padding: 1 }}>
+      <GridToolbarQuickFilter 
+        quickFilterParser={(searchInput) => searchInput.split(' ')}
+        debounceMs={300}
+      />
+    </GridToolbarContainer>
+  );
+};
 
 const ExpenseList: React.FC = () => {
   const context = useContext(ExpenseContext);
@@ -174,15 +193,14 @@ const ExpenseList: React.FC = () => {
 
   // Define columns for the DataGrid
   const columns: GridColDef[] = [
-    { field: "description", headerName: "Description", flex: 1, minWidth: 280, filterOperators: descriptionFilterOperators },
+    { field: "description", headerName: "Description", flex: 1, minWidth: 280 },
     { field: "amount", headerName: "Amount", type: "number", width: 140, align: "right", headerAlign: "right" },
-    { field: "currency", headerName: "Currency", flex: 1, filterOperators: currencyFilterOperators },
+    { field: "currency", headerName: "Currency", flex: 1 },
     {
       field: "date",
       headerName: "Date",
       flex: 1,
       minWidth: 160,
-      filterOperators: dateFilterOperators,
     },
     {
       field: "actions",
@@ -201,12 +219,8 @@ const ExpenseList: React.FC = () => {
       <DataGrid
         rows={expenses}
         columns={columns}
-        slots={{ toolbar: GridToolbar }}
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-            quickFilterProps: { debounceMs: 300 },
-          },
+        components={{
+          Toolbar: CustomToolbar,
         }}
         initialState={{
           pagination: {
@@ -216,7 +230,10 @@ const ExpenseList: React.FC = () => {
             sortModel: [{ field: "date", sort: "desc" }],
           },
           filter: {
-            filterModel: { items: [] },
+            filterModel: { 
+              items: [],
+              quickFilterValues: []
+            },
           },
         }}
         pageSizeOptions={[5, 10, 20]}
