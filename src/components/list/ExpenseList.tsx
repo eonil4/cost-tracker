@@ -1,15 +1,29 @@
-import React, { useContext, useState, useMemo } from "react";
+import React, { useContext, useState } from "react";
 import { ExpenseContext } from "../../context/ExpenseContext";
-import { DataGrid, type GridColDef, GridToolbar, type GridFilterOperator, type GridFilterInputValueProps } from "@mui/x-data-grid";
-import { TextField, Alert, Snackbar, Autocomplete } from "@mui/material";
+import { 
+  DataGrid, 
+  type GridColDef, 
+  GridToolbarQuickFilter,
+  GridToolbarContainer 
+} from "@mui/x-data-grid";
+import { Alert, Snackbar } from "@mui/material";
 import type { Expense } from "../../types";
 import ActionsCell from "./ActionsCell";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import EditExpenseDialog from "./EditExpenseDialog";
-import { 
-  createCurrencyFilterOperator
-} from "../../utils/filterUtils";
 import { validateEditForm, createUpdatedExpense } from "../../utils/formValidationUtils";
+
+// Custom toolbar with quick filter
+const CustomToolbar = () => {
+  return (
+    <GridToolbarContainer sx={{ padding: 1 }}>
+      <GridToolbarQuickFilter 
+        quickFilterParser={(searchInput) => searchInput.split(' ')}
+        debounceMs={300}
+      />
+    </GridToolbarContainer>
+  );
+};
 
 const ExpenseList: React.FC = () => {
   const context = useContext(ExpenseContext);
@@ -35,77 +49,16 @@ const ExpenseList: React.FC = () => {
   const [showError, setShowError] = useState<boolean>(false);
 
   // Extract unique descriptions from existing expenses for autocomplete options
-  const uniqueDescriptions = useMemo(
-    () => Array.from(new Set(expenses.map((exp) => exp.description))),
-    [expenses]
-  );
+  // Note: uniqueDescriptions removed since we're not using custom filter operators
 
 
-  // Autocomplete filter input for description ("contains")
-  const DescriptionFilterInput: React.FC<GridFilterInputValueProps> = (props) => {
-    const inputValue = (props.item.value as string) ?? "";
-    return (
-      <Autocomplete
-        options={uniqueDescriptions}
-        freeSolo
-        inputValue={inputValue}
-        onInputChange={(_, newInputValue) =>
-          props.applyValue({ ...props.item, value: newInputValue })
-        }
-        renderInput={(params) => (
-          <TextField {...params} label="Filter value" inputRef={props.focusElementRef} />
-        )}
-      />
-    );
-  };
+  // Note: DescriptionFilterInput removed since we're not using custom filter operators
 
 
-  const descriptionFilterOperators: GridFilterOperator[] = [
-    {
-      label: "contains",
-      value: "contains",
-      getApplyFilterFn: (filterItem) => {
-        const filterValue = (filterItem.value ?? "").toString().toLowerCase();
-        if (!filterValue) return null;
-        return (params) =>
-          (params.value ?? "").toString().toLowerCase().includes(filterValue);
-      },
-      InputComponent: DescriptionFilterInput,
-    },
-  ];
+  // Note: Filter operators removed to fix quick filter functionality
+  // Custom filter operators were interfering with the quick filter
 
-  const currencyFilterOperators: GridFilterOperator[] = [
-    createCurrencyFilterOperator(validCurrencies),
-  ];
-
-  // Date filter input using native date selector (YYYY-MM-DD)
-  const DateFilterInput: React.FC<GridFilterInputValueProps> = (props) => {
-    const value = (props.item.value as string) ?? "";
-    return (
-      <TextField
-        type="date"
-        label="Date"
-        value={value}
-        onChange={(e) => props.applyValue({ ...props.item, value: e.target.value })}
-        InputLabelProps={{ shrink: true }}
-        inputRef={props.focusElementRef}
-        fullWidth
-      />
-    );
-  };
-
-  const dateFilterOperators: GridFilterOperator[] = [
-    {
-      label: "is",
-      value: "is",
-      getApplyFilterFn: (filterItem) => {
-        const filterValue = (filterItem.value ?? "").toString();
-        if (!filterValue) return null;
-        return (params) => (params.value ?? "").toString() === filterValue;
-      },
-      InputComponent: DateFilterInput,
-    },
-  ];
+  // Note: Date filter operators also removed to fix quick filter functionality
 
   // Open the confirmation dialog
   const handleOpenDialog = (id: number) => {
@@ -174,15 +127,14 @@ const ExpenseList: React.FC = () => {
 
   // Define columns for the DataGrid
   const columns: GridColDef[] = [
-    { field: "description", headerName: "Description", flex: 1, minWidth: 280, filterOperators: descriptionFilterOperators },
+    { field: "description", headerName: "Description", flex: 1, minWidth: 280 },
     { field: "amount", headerName: "Amount", type: "number", width: 140, align: "right", headerAlign: "right" },
-    { field: "currency", headerName: "Currency", flex: 1, filterOperators: currencyFilterOperators },
+    { field: "currency", headerName: "Currency", flex: 1 },
     {
       field: "date",
       headerName: "Date",
       flex: 1,
       minWidth: 160,
-      filterOperators: dateFilterOperators,
     },
     {
       field: "actions",
@@ -201,12 +153,8 @@ const ExpenseList: React.FC = () => {
       <DataGrid
         rows={expenses}
         columns={columns}
-        slots={{ toolbar: GridToolbar }}
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-            quickFilterProps: { debounceMs: 300 },
-          },
+        slots={{
+          toolbar: CustomToolbar,
         }}
         initialState={{
           pagination: {
@@ -216,7 +164,10 @@ const ExpenseList: React.FC = () => {
             sortModel: [{ field: "date", sort: "desc" }],
           },
           filter: {
-            filterModel: { items: [] },
+            filterModel: { 
+              items: [],
+              quickFilterValues: []
+            },
           },
         }}
         pageSizeOptions={[5, 10, 20]}
@@ -233,7 +184,7 @@ const ExpenseList: React.FC = () => {
         onClose={handleCloseEditDialog}
         onSubmit={handleEditSubmit}
         validCurrencies={validCurrencies}
-        uniqueDescriptions={uniqueDescriptions}
+        uniqueDescriptions={[]}
         editDescription={editDescription}
         setEditDescription={setEditDescription}
         editAmount={editAmount}

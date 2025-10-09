@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 coverage/*
+
+# Playwright test results and reports
+report/
