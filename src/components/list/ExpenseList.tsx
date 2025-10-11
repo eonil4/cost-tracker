@@ -127,14 +127,13 @@ const ExpenseList: React.FC = () => {
 
   // Define columns for the DataGrid
   const columns: GridColDef[] = [
-    { field: "description", headerName: "Description", flex: 1, minWidth: 280 },
-    { field: "amount", headerName: "Amount", type: "number", width: 140, align: "right", headerAlign: "right" },
-    { field: "currency", headerName: "Currency", flex: 1 },
+    { field: "description", headerName: "Description", flex: 1, minWidth: 200 },
+    { field: "amount", headerName: "Amount", type: "number", width: 120, align: "right", headerAlign: "right" },
+    { field: "currency", headerName: "Currency", width: 100 },
     {
       field: "date",
       headerName: "Date",
-      flex: 1,
-      minWidth: 160,
+      width: 120,
     },
     {
       field: "actions",
@@ -144,7 +143,8 @@ const ExpenseList: React.FC = () => {
       renderCell: (params) => (
         <ActionsCell row={params.row} onEdit={handleOpenEditDialog} onDelete={(id) => handleOpenDialog(id)} />
       ),
-      flex: 0.8,
+      width: 120,
+      hideable: false, // Ensure actions column is never hidden
     },
   ];
 
@@ -173,6 +173,10 @@ const ExpenseList: React.FC = () => {
         pageSizeOptions={[5, 10, 20]}
         getRowId={(row) => row.id} // Use the `id` field as the unique identifier
         disableRowSelectionOnClick
+        autoHeight={false}
+        disableColumnMenu={false}
+        disableColumnFilter={false}
+        disableColumnSelector={false}
       />
 
       {/* Confirmation Dialog */}

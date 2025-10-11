@@ -67,3 +67,50 @@ export default tseslint.config([
   },
 ])
 ```
+
+## E2E 40 failed tests:
+```js
+    [chromium] › test\e2e\app.spec.ts:243:3 › Cost Tracker Application › should display summary charts     
+    [chromium] › test\e2e\responsive.spec.ts:111:3 › Responsive Design › should handle summary charts on mobile
+    [chromium] › test\e2e\time-period-selectors.spec.ts:38:3 › Time Period Selectors › should navigate to current month when clicking Current Month button
+    [chromium] › test\e2e\time-period-selectors.spec.ts:57:3 › Time Period Selectors › should change week selection and update daily costs
+    [chromium] › test\e2e\time-period-selectors.spec.ts:81:3 › Time Period Selectors › should change month selection and update weekly costs
+    [chromium] › test\e2e\time-period-selectors.spec.ts:104:3 › Time Period Selectors › should change year selection and update monthly costs
+    [chromium] › test\e2e\time-period-selectors.spec.ts:127:3 › Time Period Selectors › should display empty state when no expenses for selected period
+    [firefox] › test\e2e\app.spec.ts:243:3 › Cost Tracker Application › should display summary charts      
+    [firefox] › test\e2e\app.spec.ts:286:3 › Cost Tracker Application › should persist data in localStorage
+
+    [firefox] › test\e2e\responsive.spec.ts:111:3 › Responsive Design › should handle summary charts on mobile
+    [firefox] › test\e2e\time-period-selectors.spec.ts:38:3 › Time Period Selectors › should navigate to current month when clicking Current Month button
+    [firefox] › test\e2e\time-period-selectors.spec.ts:57:3 › Time Period Selectors › should change week selection and update daily costs
+    [firefox] › test\e2e\time-period-selectors.spec.ts:81:3 › Time Period Selectors › should change month selection and update weekly costs
+    [firefox] › test\e2e\time-period-selectors.spec.ts:104:3 › Time Period Selectors › should change year selection and update monthly costs
+    [firefox] › test\e2e\time-period-selectors.spec.ts:127:3 › Time Period Selectors › should display empty state when no expenses for selected period
+    [webkit] › test\e2e\app.spec.ts:243:3 › Cost Tracker Application › should display summary charts       
+    [webkit] › test\e2e\responsive.spec.ts:111:3 › Responsive Design › should handle summary charts on mobile
+    [webkit] › test\e2e\time-period-selectors.spec.ts:38:3 › Time Period Selectors › should navigate to current month when clicking Current Month button
+    [webkit] › test\e2e\time-period-selectors.spec.ts:57:3 › Time Period Selectors › should change week selection and update daily costs
+    [webkit] › test\e2e\time-period-selectors.spec.ts:81:3 › Time Period Selectors › should change month selection and update weekly costs
+    [webkit] › test\e2e\time-period-selectors.spec.ts:104:3 › Time Period Selectors › should change year selection and update monthly costs
+    [webkit] › test\e2e\time-period-selectors.spec.ts:127:3 › Time Period Selectors › should display empty state when no expenses for selected period
+    [Mobile Chrome] › test\e2e\app.spec.ts:125:3 › Cost Tracker Application › should delete an expense     
+    [Mobile Chrome] › test\e2e\app.spec.ts:154:3 › Cost Tracker Application › should filter expenses by currency
+    [Mobile Chrome] › test\e2e\app.spec.ts:243:3 › Cost Tracker Application › should display summary charts
+
+    [Mobile Chrome] › test\e2e\responsive.spec.ts:111:3 › Responsive Design › should handle summary charts on mobile
+    [Mobile Chrome] › test\e2e\time-period-selectors.spec.ts:38:3 › Time Period Selectors › should navigate to current month when clicking Current Month button
+    [Mobile Chrome] › test\e2e\time-period-selectors.spec.ts:57:3 › Time Period Selectors › should change week selection and update daily costs
+    [Mobile Chrome] › test\e2e\time-period-selectors.spec.ts:81:3 › Time Period Selectors › should change month selection and update weekly costs
+    [Mobile Chrome] › test\e2e\time-period-selectors.spec.ts:104:3 › Time Period Selectors › should change year selection and update monthly costs
+    [Mobile Chrome] › test\e2e\time-period-selectors.spec.ts:127:3 › Time Period Selectors › should display empty state when no expenses for selected period
+    [Mobile Safari] › test\e2e\app.spec.ts:125:3 › Cost Tracker Application › should delete an expense     
+    [Mobile Safari] › test\e2e\app.spec.ts:154:3 › Cost Tracker Application › should filter expenses by currency
+    [Mobile Safari] › test\e2e\app.spec.ts:243:3 › Cost Tracker Application › should display summary charts
+
+    [Mobile Safari] › test\e2e\responsive.spec.ts:111:3 › Responsive Design › should handle summary charts on mobile
+    [Mobile Safari] › test\e2e\time-period-selectors.spec.ts:38:3 › Time Period Selectors › should navigate to current month when clicking Current Month button
+    [Mobile Safari] › test\e2e\time-period-selectors.spec.ts:57:3 › Time Period Selectors › should change week selection and update daily costs
+    [Mobile Safari] › test\e2e\time-period-selectors.spec.ts:81:3 › Time Period Selectors › should change month selection and update weekly costs
+    [Mobile Safari] › test\e2e\time-period-selectors.spec.ts:104:3 › Time Period Selectors › should change year selection and update monthly costs
+    [Mobile Safari] › test\e2e\time-period-selectors.spec.ts:127:3 › Time Period Selectors › should display empty state when no expenses for selected period
+```
