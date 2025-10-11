@@ -5,17 +5,17 @@ import { webcrypto } from 'crypto';
 
 // Polyfill for globalThis.crypto
 if (typeof globalThis.crypto === 'undefined') {
-  globalThis.crypto = webcrypto as any;
+  globalThis.crypto = webcrypto as Crypto;
 }
 
 // Polyfill for global.crypto (Node.js global)
 if (typeof global !== 'undefined' && !global.crypto) {
-  (global as any).crypto = webcrypto;
+  (global as typeof globalThis & { crypto: Crypto }).crypto = webcrypto;
 }
 
 // Polyfill for window.crypto (browser context)
 if (typeof window !== 'undefined' && !window.crypto) {
-  (window as any).crypto = webcrypto;
+  (window as typeof window & { crypto: Crypto }).crypto = webcrypto;
 }
 
 // Ensure crypto.randomUUID is available
@@ -39,7 +39,7 @@ if (globalThis.crypto && !globalThis.crypto.random) {
 }
 
 // Add page context polyfill for browser tests
-export const addCryptoPolyfill = async (page: any) => {
+export const addCryptoPolyfill = async (page: { addInitScript: (script: () => void) => Promise<void> }) => {
   await page.addInitScript(() => {
     // Ensure crypto is available in the page context
     if (typeof window.crypto === 'undefined') {

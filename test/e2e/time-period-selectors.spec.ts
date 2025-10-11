@@ -40,7 +40,8 @@ test.describe('Time Period Selectors', () => {
     await page.getByRole('button', { name: 'Current Month' }).click();
     
     // Verify the month picker shows current month
-    const monthPicker = page.locator('input[type="month"]').first();
+    // MUI DatePicker renders as text input, not month input
+    const monthPicker = page.locator('input[type="text"]').nth(1); // Second text input (month picker)
     await expect(monthPicker).toBeVisible();
   });
 
@@ -68,7 +69,8 @@ test.describe('Time Period Selectors', () => {
     await expect(page.getByText('Week Test Expense')).toBeVisible();
     
     // Try to change the week selection - look for MUI DatePicker input
-    const weekDatePicker = page.locator('input[type="text"]').nth(1); // Second text input (after description)
+    const weekDatePicker = page.locator('input[type="text"]').nth(1); // Second text input (week picker)        
+    await weekDatePicker.waitFor({ state: 'visible' });
     await weekDatePicker.click();
     
     // Select a different date (this might open a date picker modal)
@@ -91,7 +93,8 @@ test.describe('Time Period Selectors', () => {
     await expect(page.getByText('Month Test Expense')).toBeVisible();
     
     // Try to change the month selection - look for MUI DatePicker input
-    const monthPicker = page.locator('input[type="text"]').nth(2); // Third text input (after description and week picker)
+    const monthPicker = page.locator('input[type="text"]').nth(2); // Third text input (month picker)
+    await monthPicker.waitFor({ state: 'visible' });
     await monthPicker.click();
     
     // The month picker should be visible and interactive
@@ -113,7 +116,8 @@ test.describe('Time Period Selectors', () => {
     await expect(page.getByText('Year Test Expense')).toBeVisible();
     
     // Try to change the year selection - look for MUI DatePicker input
-    const yearPicker = page.locator('input[type="text"]').nth(3); // Fourth text input (after description, week, and month pickers)
+    const yearPicker = page.locator('input[type="text"]').nth(3); // Fourth text input (year picker)
+    await yearPicker.waitFor({ state: 'visible' });
     await yearPicker.click();
     
     // The year picker should be visible and interactive
@@ -123,6 +127,7 @@ test.describe('Time Period Selectors', () => {
   test('should display empty state when no expenses for selected period', async ({ page }) => {
     // Navigate to a different year (assuming no expenses exist for that year)
     const yearPicker = page.locator('input[type="text"]').nth(3); // Fourth text input (year picker)
+    await yearPicker.waitFor({ state: 'visible' });
     await yearPicker.fill('2020');
     await yearPicker.press('Enter');
     

@@ -82,8 +82,11 @@ test.describe('Cost Tracker Application', () => {
     await expect(page.getByText('Original Expense')).toBeVisible({ timeout: 10000 });
     
     // Click edit button (icon button with edit icon) - look for action buttons in the grid
-    const editButton = page.locator('[role="gridcell"] button').first(); // First button in a grid cell (edit)
-    await editButton.waitFor({ state: 'visible' });
+    // Wait for the expense to be added and grid to render
+    await expect(page.getByText('Expense to Edit')).toBeVisible();
+    
+    const editButton = page.locator('[role="gridcell"] button').first(); // First button in a grid cell (edit)        
+    await editButton.waitFor({ state: 'visible', timeout: 10000 });
     await editButton.click();
     
     // Wait for edit dialog
@@ -121,7 +124,12 @@ test.describe('Cost Tracker Application', () => {
     await expect(page.getByText('Expense to Delete')).toBeVisible();
     
     // Click delete button (icon button with trash icon) - look for action buttons in the grid
-    await page.locator('[role="gridcell"] button').nth(1).click(); // Second button in a grid cell (delete)
+    // Wait for the expense to be added and grid to render
+    await expect(page.getByText('Expense to Delete')).toBeVisible();
+    
+    const deleteButton = page.locator('[role="gridcell"] button').nth(1); // Second button in a grid cell (delete)
+    await deleteButton.waitFor({ state: 'visible', timeout: 10000 });
+    await deleteButton.click();
     
     // Confirm deletion
     await page.getByRole('button', { name: 'Delete' }).click();
@@ -216,7 +224,7 @@ test.describe('Cost Tracker Application', () => {
     await themeToggle.click();
     
     // Verify the button text changes (indicating theme change)
-    await expect(themeToggle).toHaveAttribute('aria-label', /switch to dark mode|switch to system theme|switch to light mode/);
+    await expect(themeToggle).toHaveAttribute('aria-label', /Switch to dark mode|Switch to system theme|Switch to light mode/);
   });
 
   test('should display summary charts', async ({ page }) => {
@@ -249,7 +257,8 @@ test.describe('Cost Tracker Application', () => {
     await expect(page.getByText(/Monthly Costs -/)).toBeVisible();
     
     // Check for chart elements (SVG elements from recharts)
-    await expect(page.locator('svg')).toBeVisible();
+    // Look for recharts SVG elements specifically
+    await expect(page.locator('.recharts-wrapper svg')).toBeVisible();
   });
 
   test('should handle form validation', async ({ page }) => {
@@ -278,7 +287,11 @@ test.describe('Cost Tracker Application', () => {
     // Reload the page
     await page.reload();
     
+    // Wait for the page to load and data to be restored from localStorage
+    await page.waitForLoadState('networkidle');
+    await page.waitForSelector('[role="grid"]', { timeout: 10000 });
+    
     // Verify expense is still there (persisted in localStorage)
-    await expect(page.getByText('Persistent Expense')).toBeVisible();
+    await expect(page.getByText('Persistent Expense')).toBeVisible({ timeout: 10000 });
   });
 });
