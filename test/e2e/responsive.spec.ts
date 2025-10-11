@@ -132,7 +132,7 @@ test.describe('Responsive Design', () => {
     await expect(page.getByText(/Monthly Costs -/)).toBeVisible();
     
     // Check for chart elements
-    // Look for recharts SVG elements specifically
-    await expect(page.locator('.recharts-wrapper svg')).toBeVisible();
+    // Look for recharts SVG elements specifically - use first() to avoid strict mode violation
+    await expect(page.locator('.recharts-wrapper svg').first()).toBeVisible();
   });
 });

@@ -127,13 +127,14 @@ const ExpenseList: React.FC = () => {
 
   // Define columns for the DataGrid
   const columns: GridColDef[] = [
-    { field: "description", headerName: "Description", flex: 1, minWidth: 200 },
-    { field: "amount", headerName: "Amount", type: "number", width: 120, align: "right", headerAlign: "right" },
-    { field: "currency", headerName: "Currency", width: 100 },
+    { field: "description", headerName: "Description", flex: 1, minWidth: 280 },
+    { field: "amount", headerName: "Amount", type: "number", width: 140, align: "right", headerAlign: "right" },
+    { field: "currency", headerName: "Currency", flex: 1 },
     {
       field: "date",
       headerName: "Date",
-      width: 120,
+      flex: 1,
+      minWidth: 160,
     },
     {
       field: "actions",
@@ -143,13 +144,14 @@ const ExpenseList: React.FC = () => {
       renderCell: (params) => (
         <ActionsCell row={params.row} onEdit={handleOpenEditDialog} onDelete={(id) => handleOpenDialog(id)} />
       ),
-      width: 120,
-      hideable: false, // Ensure actions column is never hidden
+      flex: 0.8,
+      minWidth: 120, // Ensure actions column has minimum width
+      hideable: false, // Prevent hiding the actions column
     },
   ];
 
   return (
-    <div style={{ height: 400, marginTop: "2rem" }}>
+    <div style={{ height: 400, marginTop: "2rem", width: "100%", minWidth: "800px" }}>
       <DataGrid
         rows={expenses}
         columns={columns}
@@ -177,6 +179,12 @@ const ExpenseList: React.FC = () => {
         disableColumnMenu={false}
         disableColumnFilter={false}
         disableColumnSelector={false}
+        columnVisibilityModel={{}} // Ensure all columns are visible by default
+        sx={{
+          '& .MuiDataGrid-root': {
+            minWidth: '800px', // Force minimum width to prevent column hiding
+          }
+        }}
       />
 
       {/* Confirmation Dialog */}
