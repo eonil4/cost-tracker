@@ -25,7 +25,7 @@ vi.mock('@mui/material', () => ({
       data-testid="typography"
       data-variant={variant}
       data-align={align}
-      data-gutter-bottom={gutterBottom}
+      data-gutter-bottom={gutterBottom?.toString()}
       {...props}
     >
       {children as React.ReactNode}
@@ -47,7 +47,7 @@ vi.mock('recharts', () => ({
       {children as React.ReactNode}
     </div>
   ),
-  Pie: ({ data, dataKey, nameKey, cx, cy, outerRadius, fill, ...props }: Record<string, unknown>) => (
+  Pie: ({ data, dataKey, nameKey, cx, cy, outerRadius, fill, label, ...props }: Record<string, unknown>) => (
     <div 
       data-testid="pie" 
       data-data-key={dataKey}
@@ -56,6 +56,7 @@ vi.mock('recharts', () => ({
       data-cy={cy}
       data-outer-radius={outerRadius}
       data-fill={fill}
+      data-label={label?.toString()}
       {...props}
     >
       {(data as Array<Record<string, unknown>>)?.map((item: Record<string, unknown>, index: number) => (
