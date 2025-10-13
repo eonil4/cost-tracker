@@ -80,7 +80,7 @@ test.describe('Responsive Design', () => {
     await themeToggle.click();
     
     // Verify theme toggle works
-    await expect(themeToggle).toHaveAttribute('aria-label', /switch to dark mode|switch to system theme|switch to light mode/);
+    await expect(themeToggle).toHaveAttribute('aria-label', /Switch to dark mode|Switch to system theme|Switch to light mode/);
   });
 
   test('should handle data grid on mobile', async ({ page }) => {
@@ -132,6 +132,7 @@ test.describe('Responsive Design', () => {
     await expect(page.getByText(/Monthly Costs -/)).toBeVisible();
     
     // Check for chart elements
-    await expect(page.locator('svg')).toBeVisible();
+    // Look for recharts SVG elements specifically - use first() to avoid strict mode violation
+    await expect(page.locator('.recharts-wrapper svg').first()).toBeVisible();
   });
 });

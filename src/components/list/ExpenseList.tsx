@@ -145,11 +145,13 @@ const ExpenseList: React.FC = () => {
         <ActionsCell row={params.row} onEdit={handleOpenEditDialog} onDelete={(id) => handleOpenDialog(id)} />
       ),
       flex: 0.8,
+      minWidth: 120, // Ensure actions column has minimum width
+      hideable: false, // Prevent hiding the actions column
     },
   ];
 
   return (
-    <div style={{ height: 400, marginTop: "2rem" }}>
+    <div style={{ height: 400, marginTop: "2rem", width: "100%", minWidth: "800px" }}>
       <DataGrid
         rows={expenses}
         columns={columns}
@@ -173,6 +175,16 @@ const ExpenseList: React.FC = () => {
         pageSizeOptions={[5, 10, 20]}
         getRowId={(row) => row.id} // Use the `id` field as the unique identifier
         disableRowSelectionOnClick
+        autoHeight={false}
+        disableColumnMenu={false}
+        disableColumnFilter={false}
+        disableColumnSelector={false}
+        columnVisibilityModel={{}} // Ensure all columns are visible by default
+        sx={{
+          '& .MuiDataGrid-root': {
+            minWidth: '800px', // Force minimum width to prevent column hiding
+          }
+        }}
       />
 
       {/* Confirmation Dialog */}

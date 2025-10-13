@@ -11,10 +11,10 @@ Object.defineProperty(globalThis, 'crypto', {
 
 // Mock Material-UI components to avoid complex rendering issues
 vi.mock('@mui/material', () => ({
-  Container: ({ children, ...props }: Record<string, unknown>) => <div data-testid="container" {...props}>{children as React.ReactNode}</div>,
+  Container: ({ children, maxWidth, ...props }: Record<string, unknown>) => <div data-testid="container" data-max-width={maxWidth} {...props}>{children as React.ReactNode}</div>,
   Typography: ({ children, ...props }: Record<string, unknown>) => <div data-testid="typography" {...props}>{children as React.ReactNode}</div>,
   Paper: ({ children, ...props }: Record<string, unknown>) => <div data-testid="paper" {...props}>{children as React.ReactNode}</div>,
-  Grid: ({ children, ...props }: Record<string, unknown>) => <div data-testid="grid" {...props}>{children as React.ReactNode}</div>,
+  Grid: ({ children, container, ...props }: Record<string, unknown>) => <div data-testid="grid" data-container={container?.toString()} {...props}>{children as React.ReactNode}</div>,
   Box: ({ children, ...props }: Record<string, unknown>) => <div data-testid="box" {...props}>{children as React.ReactNode}</div>,
   CssBaseline: () => <div data-testid="css-baseline" />,
 }));

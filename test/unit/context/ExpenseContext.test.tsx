@@ -97,7 +97,9 @@ describe('ExpenseContext', () => {
       };
 
       act(() => {
+        act(() => {
         result.current.addExpense(newExpense);
+      });
       });
 
       expect(result.current.expenses).toHaveLength(1);
@@ -116,7 +118,9 @@ describe('ExpenseContext', () => {
       };
 
       act(() => {
+        act(() => {
         result.current.addExpense(newExpense);
+      });
       });
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
@@ -175,11 +179,15 @@ describe('ExpenseContext', () => {
       };
 
       act(() => {
-        result.current.addExpense(originalExpense);
+        act(() => {
+          result.current.addExpense(originalExpense);
+        });
       });
 
       act(() => {
-        result.current.updateExpense(1, updatedExpense);
+        act(() => {
+          result.current.updateExpense(1, updatedExpense);
+        });
       });
 
       expect(result.current.expenses[0]).toEqual({
@@ -224,11 +232,15 @@ describe('ExpenseContext', () => {
       };
 
       act(() => {
-        result.current.addExpense(originalExpense);
+        act(() => {
+          result.current.addExpense(originalExpense);
+        });
       });
 
       act(() => {
-        result.current.updateExpense(1, updatedExpense);
+        act(() => {
+          result.current.updateExpense(1, updatedExpense);
+        });
       });
 
       const lastCall = localStorageMock.setItem.mock.calls[localStorageMock.setItem.mock.calls.length - 1];
@@ -264,7 +276,9 @@ describe('ExpenseContext', () => {
       });
 
       act(() => {
-        result.current.deleteExpense(1);
+        act(() => {
+          result.current.deleteExpense(1);
+        });
       });
 
       expect(result.current.expenses).toHaveLength(1);
@@ -283,7 +297,9 @@ describe('ExpenseContext', () => {
       };
 
       act(() => {
-        result.current.addExpense(expense);
+        act(() => {
+          result.current.addExpense(expense);
+        });
       });
 
       act(() => {
@@ -306,11 +322,15 @@ describe('ExpenseContext', () => {
       };
 
       act(() => {
-        result.current.addExpense(expense);
+        act(() => {
+          result.current.addExpense(expense);
+        });
       });
 
       act(() => {
-        result.current.deleteExpense(1);
+        act(() => {
+          result.current.deleteExpense(1);
+        });
       });
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
@@ -454,7 +474,11 @@ describe('ExpenseContext', () => {
 
       // This should not throw an error even if localStorage fails
       expect(() => {
-        result.current.addExpense(expense);
+        act(() => {
+          act(() => {
+          result.current.addExpense(expense);
+        });
+        });
       }).not.toThrow();
 
       // Restore original implementation
@@ -476,7 +500,9 @@ describe('ExpenseContext', () => {
 
       invalidExpenses.forEach(invalidExpense => {
         const initialLength = result.current.expenses.length;
-        result.current.addExpense(invalidExpense as Expense);
+        act(() => {
+          result.current.addExpense(invalidExpense as Expense);
+        });
         // Expenses should not be added
         expect(result.current.expenses).toHaveLength(initialLength);
       });
@@ -493,7 +519,9 @@ describe('ExpenseContext', () => {
         date: '2024-01-01',
         currency: 'USD'
       };
-      result.current.addExpense(validExpense);
+      act(() => {
+        result.current.addExpense(validExpense);
+      });
 
       const invalidUpdates = [
         null,
@@ -506,7 +534,9 @@ describe('ExpenseContext', () => {
 
       invalidUpdates.forEach(invalidUpdate => {
         const originalExpense = result.current.expenses[0];
-        result.current.updateExpense(1, invalidUpdate as Omit<Expense, 'id'>);
+        act(() => {
+          result.current.updateExpense(1, invalidUpdate as Omit<Expense, 'id'>);
+        });
         // Expense should not be updated
         expect(result.current.expenses[0]).toEqual(originalExpense);
       });
@@ -524,7 +554,9 @@ describe('ExpenseContext', () => {
         currency: 'USD'
       };
       act(() => {
+        act(() => {
         result.current.addExpense(validExpense);
+      });
       });
 
       // Update the expense
@@ -560,7 +592,9 @@ describe('ExpenseContext', () => {
         currency: 'USD'
       };
       act(() => {
+        act(() => {
         result.current.addExpense(validExpense);
+      });
       });
 
       // Try to update non-existent expense
