@@ -201,3 +201,84 @@ export const getYearsWithData = (expenses: Expense[]): number[] => {
   
   return Array.from(yearSet).sort((a, b) => b - a);
 };
+
+/**
+ * Calculates daily costs by currency for a specific week
+ * @param expenses - Array of expenses
+ * @param weekStart - Start date of the week
+ * @returns Object with daily costs grouped by currency
+ */
+export const calculateDailyCostsByCurrencyForWeek = (expenses: Expense[], weekStart: Date): Record<string, Record<string, number>> => {
+  const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+  
+  return expenses.reduce((acc, expense) => {
+    const expenseDate = parseISO(expense.date);
+    if (isWithinInterval(expenseDate, { start: weekStart, end: weekEnd })) {
+      const dayName = format(expenseDate, 'EEEE');
+      if (!acc[expense.currency]) {
+        acc[expense.currency] = {};
+      }
+      acc[expense.currency][dayName] = (acc[expense.currency][dayName] || 0) + expense.amount;
+    }
+    return acc;
+  }, {} as Record<string, Record<string, number>>);
+};
+
+/**
+ * Calculates weekly costs by currency for a specific month
+ * @param expenses - Array of expenses
+ * @param monthStart - Start date of the month
+ * @returns Object with weekly costs grouped by currency
+ */
+export const calculateWeeklyCostsByCurrencyForMonth = (expenses: Expense[], monthStart: Date): Record<string, Record<string, number>> => {
+  const monthEnd = endOfMonth(monthStart);
+  
+  return expenses.reduce((acc, expense) => {
+    const expenseDate = parseISO(expense.date);
+    if (isWithinInterval(expenseDate, { start: monthStart, end: monthEnd })) {
+      const weekStart = startOfWeek(expenseDate, { weekStartsOn: 1 });
+      const weekKey = format(weekStart, 'MMM dd');
+      if (!acc[expense.currency]) {
+        acc[expense.currency] = {};
+      }
+      acc[expense.currency][weekKey] = (acc[expense.currency][weekKey] || 0) + expense.amount;
+    }
+    return acc;
+  }, {} as Record<string, Record<string, number>>);
+};
+
+/**
+ * Calculates monthly costs by currency for a specific year
+ * @param expenses - Array of expenses
+ * @param year - Year to calculate for
+ * @returns Object with monthly costs grouped by currency
+ */
+export const calculateMonthlyCostsByCurrencyForYear = (expenses: Expense[], year: number): Record<string, Record<string, number>> => {
+  const yearStart = new Date(year, 0, 1);
+  const yearEnd = new Date(year, 11, 31);
+  
+  return expenses.reduce((acc, expense) => {
+    const expenseDate = parseISO(expense.date);
+    if (isWithinInterval(expenseDate, { start: yearStart, end: yearEnd })) {
+      const month = format(expenseDate, "MMMM");
+      if (!acc[expense.currency]) {
+        acc[expense.currency] = {};
+      }
+      acc[expense.currency][month] = (acc[expense.currency][month] || 0) + expense.amount;
+    }
+    return acc;
+  }, {} as Record<string, Record<string, number>>);
+};
+
+/**
+ * Gets all unique currencies from expenses
+ * @param expenses - Array of expenses
+ * @returns Array of unique currency codes
+ */
+export const getUniqueCurrencies = (expenses: Expense[]): string[] => {
+  const currencySet = new Set<string>();
+  expenses.forEach(expense => {
+    currencySet.add(expense.currency);
+  });
+  return Array.from(currencySet).sort();
+};

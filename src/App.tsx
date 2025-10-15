@@ -4,8 +4,9 @@ import { ThemeProvider } from "./context/ThemeContext";
 import ExpenseForm from "./components/form/ExpenseForm";
 import ExpenseList from "./components/list/ExpenseList";
 import { Container, Typography, Paper, Grid, Box } from "@mui/material";
-import SummaryGrid from "./components/summary/SummaryGrid";
+import CurrencySummaryGrid from "./components/summary/CurrencySummaryGrid";
 import ThemeToggle from "./components/ThemeToggle";
+import { TILE_HEIGHT } from "./constants/ui";
 
 
 const App: React.FC = () => {
@@ -21,11 +22,11 @@ const App: React.FC = () => {
           </Box>
         <Grid container spacing={3}>
           {/* Row 1: Form + List */}
-          <Grid size={12} sx={{ mb: { xs: 3, sm: 4, md: 5 } }}>
+          <Grid size={12}>
             <Grid container spacing={{ xs: 0, md: 3 }}>
               {/* Form Tile */}
               <Grid size={{ xs: 12, md: 4 }} sx={{ mb: { xs: 3, md: 0 } }}>
-                <Paper elevation={3} sx={{ padding: 3, height: "100%", minHeight: 400 }}>
+                <Paper elevation={3} sx={{ padding: 3, height: TILE_HEIGHT }}>
                   <Typography variant="h6" gutterBottom>
                     Add Expense
                   </Typography>
@@ -35,7 +36,7 @@ const App: React.FC = () => {
 
               {/* List Tile */}
               <Grid size={{ xs: 12, md: 8 }}>
-                <Paper elevation={3} sx={{ padding: 3, height: "100%", minHeight: 400 }}>
+                <Paper elevation={3} sx={{ padding: 3, height: TILE_HEIGHT }}>
                   <Typography variant="h6" gutterBottom>
                     Expenses
                   </Typography>
@@ -45,9 +46,10 @@ const App: React.FC = () => {
             </Grid>
           </Grid>
 
-          {/* Row 2: Summary */}
-          <Grid size={12} sx={{ mt: { xs: 1, sm: 2 } }}>
-            <SummaryGrid />
+
+          {/* Row 2: Currency Summaries */}
+          <Grid size={12}>
+            <CurrencySummaryGrid />
           </Grid>
         </Grid>
         </Container>

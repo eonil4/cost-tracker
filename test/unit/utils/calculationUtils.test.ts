@@ -11,7 +11,11 @@ import {
   calculateMonthlyCostsForYear,
   getWeeksWithData,
   getMonthsWithData,
-  getYearsWithData
+  getYearsWithData,
+  calculateDailyCostsByCurrencyForWeek,
+  calculateWeeklyCostsByCurrencyForMonth,
+  calculateMonthlyCostsByCurrencyForYear,
+  getUniqueCurrencies
 } from '../../../src/utils/calculationUtils';
 import type { Expense } from '../../../src/types';
 
@@ -301,6 +305,112 @@ describe('calculationUtils', () => {
       const result = getYearsWithData([]);
       
       expect(result).toEqual([]);
+    });
+  });
+
+  describe('calculateDailyCostsByCurrencyForWeek', () => {
+    it('should calculate daily costs by currency for a specific week', () => {
+      const weekStart = new Date('2024-01-15'); // Monday
+      const result = calculateDailyCostsByCurrencyForWeek(mockExpenses, weekStart);
+      
+      expect(result).toBeDefined();
+      expect(typeof result).toBe('object');
+    });
+
+    it('should return empty object when no expenses in the week', () => {
+      const weekStart = new Date('2024-12-01'); // Week with no expenses
+      const result = calculateDailyCostsByCurrencyForWeek(mockExpenses, weekStart);
+      
+      expect(result).toEqual({});
+    });
+
+    it('should group expenses by currency', () => {
+      const weekStart = new Date('2024-01-15'); // Monday
+      const result = calculateDailyCostsByCurrencyForWeek(mockExpenses, weekStart);
+      
+      // Should have currency keys
+      expect(Object.keys(result)).toContain('USD');
+      expect(Object.keys(result)).toContain('EUR');
+    });
+  });
+
+  describe('calculateWeeklyCostsByCurrencyForMonth', () => {
+    it('should calculate weekly costs by currency for a specific month', () => {
+      const monthStart = new Date('2024-01-01');
+      const result = calculateWeeklyCostsByCurrencyForMonth(mockExpenses, monthStart);
+      
+      expect(result).toBeDefined();
+      expect(typeof result).toBe('object');
+    });
+
+    it('should return empty object when no expenses in the month', () => {
+      const monthStart = new Date('2024-12-01');
+      const result = calculateWeeklyCostsByCurrencyForMonth(mockExpenses, monthStart);
+      
+      expect(result).toEqual({});
+    });
+
+    it('should group expenses by currency', () => {
+      const monthStart = new Date('2024-01-01');
+      const result = calculateWeeklyCostsByCurrencyForMonth(mockExpenses, monthStart);
+      
+      // Should have currency keys
+      expect(Object.keys(result)).toContain('USD');
+      expect(Object.keys(result)).toContain('EUR');
+    });
+  });
+
+  describe('calculateMonthlyCostsByCurrencyForYear', () => {
+    it('should calculate monthly costs by currency for a specific year', () => {
+      const year = 2024;
+      const result = calculateMonthlyCostsByCurrencyForYear(mockExpenses, year);
+      
+      expect(result).toBeDefined();
+      expect(typeof result).toBe('object');
+    });
+
+    it('should return empty object when no expenses in the year', () => {
+      const year = 2020;
+      const result = calculateMonthlyCostsByCurrencyForYear(mockExpenses, year);
+      
+      expect(result).toEqual({});
+    });
+
+    it('should group expenses by currency', () => {
+      const year = 2024;
+      const result = calculateMonthlyCostsByCurrencyForYear(mockExpenses, year);
+      
+      // Should have currency keys
+      expect(Object.keys(result)).toContain('USD');
+      expect(Object.keys(result)).toContain('EUR');
+      expect(Object.keys(result)).toContain('HUF');
+    });
+  });
+
+  describe('getUniqueCurrencies', () => {
+    it('should return unique currencies from expenses', () => {
+      const result = getUniqueCurrencies(mockExpenses);
+      
+      expect(result).toEqual(['EUR', 'HUF', 'USD']); // Sorted alphabetically
+    });
+
+    it('should return empty array when no expenses', () => {
+      const result = getUniqueCurrencies([]);
+      
+      expect(result).toEqual([]);
+    });
+
+    it('should handle single currency', () => {
+      const singleCurrencyExpenses: Expense[] = [{
+        id: 1,
+        description: 'Test',
+        amount: 100,
+        date: '2024-01-01',
+        currency: 'USD'
+      }];
+
+      const result = getUniqueCurrencies(singleCurrencyExpenses);
+      expect(result).toEqual(['USD']);
     });
   });
 });

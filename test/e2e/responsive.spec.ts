@@ -127,9 +127,9 @@ test.describe('Responsive Design', () => {
     await expect(page.getByText('Chart Test')).toBeVisible();
     
     // Check that charts are visible on mobile
-    await expect(page.getByText(/Daily Costs - Week of/)).toBeVisible();
-    await expect(page.getByText(/Weekly Costs -/)).toBeVisible();
-    await expect(page.getByText(/Monthly Costs -/)).toBeVisible();
+    await expect(page.getByText(/Daily Costs - Week of/).first()).toBeVisible();
+    await expect(page.getByText(/Weekly Costs -/).first()).toBeVisible();
+    await expect(page.getByText(/Monthly Costs -/).first()).toBeVisible();
     
     // Check for chart elements
     // Look for recharts SVG elements specifically - use first() to avoid strict mode violation

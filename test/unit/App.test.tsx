@@ -41,6 +41,10 @@ vi.mock('../../src/components/summary/SummaryGrid', () => ({
   default: () => <div data-testid="summary-grid">SummaryGrid</div>
 }));
 
+vi.mock('../../src/components/summary/CurrencySummaryGrid', () => ({
+  default: () => <div data-testid="currency-summary-grid">CurrencySummaryGrid</div>
+}));
+
 vi.mock('../../src/components/ThemeToggle', () => ({
   default: () => <div data-testid="theme-toggle">ThemeToggle</div>
 }));
@@ -62,7 +66,7 @@ describe('App', () => {
     expect(screen.getByText('Expenses')).toBeInTheDocument();
     expect(screen.getByTestId('expense-form')).toBeInTheDocument();
     expect(screen.getByTestId('expense-list')).toBeInTheDocument();
-    expect(screen.getByTestId('summary-grid')).toBeInTheDocument();
+    expect(screen.getByTestId('currency-summary-grid')).toBeInTheDocument();
   });
 
   it('should render with proper layout structure', () => {

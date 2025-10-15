@@ -13,12 +13,12 @@ export interface EditFormData {
 }
 
 /**
- * Validates edit form data
+ * Core validation logic for expense form data
  * @param formData - The form data to validate
  * @param validCurrencies - Array of valid currencies
  * @returns Validation result with error message if invalid
  */
-export const validateEditForm = (
+const validateExpenseFormData = (
   formData: EditFormData,
   validCurrencies: string[]
 ): FormValidationResult => {
@@ -48,6 +48,19 @@ export const validateEditForm = (
   }
 
   return { isValid: true };
+};
+
+/**
+ * Validates edit form data
+ * @param formData - The form data to validate
+ * @param validCurrencies - Array of valid currencies
+ * @returns Validation result with error message if invalid
+ */
+export const validateEditForm = (
+  formData: EditFormData,
+  validCurrencies: string[]
+): FormValidationResult => {
+  return validateExpenseFormData(formData, validCurrencies);
 };
 
 /**
@@ -74,32 +87,7 @@ export const validateExpenseForm = (
   formData: EditFormData,
   validCurrencies: string[]
 ): FormValidationResult => {
-  // Check if all fields are filled
-  if (!formData.description.trim() || !formData.amount || !formData.date || !formData.currency) {
-    return {
-      isValid: false,
-      errorMessage: "Please fill in all fields."
-    };
-  }
-
-  // Validate currency
-  if (!validCurrencies.includes(formData.currency)) {
-    return {
-      isValid: false,
-      errorMessage: "Please select a valid currency."
-    };
-  }
-
-  // Validate amount is a positive number
-  const parsedAmount = parseFloat(formData.amount);
-  if (isNaN(parsedAmount) || parsedAmount <= 0) {
-    return {
-      isValid: false,
-      errorMessage: "Please enter a valid positive amount."
-    };
-  }
-
-  return { isValid: true };
+  return validateExpenseFormData(formData, validCurrencies);
 };
 
 /**
