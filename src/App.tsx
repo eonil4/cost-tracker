@@ -4,7 +4,6 @@ import { ThemeProvider } from "./context/ThemeContext";
 import ExpenseForm from "./components/form/ExpenseForm";
 import ExpenseList from "./components/list/ExpenseList";
 import { Container, Typography, Paper, Grid, Box } from "@mui/material";
-import SummaryGrid from "./components/summary/SummaryGrid";
 import CurrencySummaryGrid from "./components/summary/CurrencySummaryGrid";
 import ThemeToggle from "./components/ThemeToggle";
 
@@ -46,12 +45,8 @@ const App: React.FC = () => {
             </Grid>
           </Grid>
 
-          {/* Row 2: Summary */}
-          <Grid size={12} sx={{ mt: { xs: 1, sm: 2 } }}>
-            <SummaryGrid />
-          </Grid>
 
-          {/* Row 3: Currency Summaries */}
+          {/* Row 2: Currency Summaries */}
           <Grid size={12} sx={{ mt: { xs: 1, sm: 2 } }}>
             <CurrencySummaryGrid />
           </Grid>
