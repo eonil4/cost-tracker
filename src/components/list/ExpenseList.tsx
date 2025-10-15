@@ -12,6 +12,10 @@ import ActionsCell from "./ActionsCell";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import EditExpenseDialog from "./EditExpenseDialog";
 import { validateEditForm, createUpdatedExpense } from "../../utils/formValidationUtils";
+import { CURRENCY_ORDER } from "../../constants/currencies";
+import { useDialog } from "../../hooks/useDialog";
+import { useErrorHandler } from "../../hooks/useErrorHandler";
+import { DATA_GRID_HEIGHT, DATA_GRID_MIN_WIDTH, COLUMN_WIDTHS } from "../../constants/ui";
 
 // Custom toolbar with quick filter
 const CustomToolbar = () => {
@@ -32,52 +36,40 @@ const ExpenseList: React.FC = () => {
   const { expenses, deleteExpense, updateExpense } = context;
 
   // Valid currencies
-  const validCurrencies = ["HUF", "USD", "EUR", "GBP"];
+  const validCurrencies = CURRENCY_ORDER;
 
-  // State for managing the confirmation dialog
-  const [open, setOpen] = useState(false);
+  // Custom hooks for state management
+  const deleteDialog = useDialog();
+  const editDialog = useDialog();
+  const errorHandler = useErrorHandler();
+
+  // State for managing selected expense
   const [selectedExpenseId, setSelectedExpenseId] = useState<number | null>(null);
-
-  // State for managing the edit dialog
-  const [editOpen, setEditOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [editDescription, setEditDescription] = useState<string>("");
   const [editAmount, setEditAmount] = useState<string>("");
   const [editDate, setEditDate] = useState<string>("");
   const [editCurrency, setEditCurrency] = useState<string>("HUF");
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [showError, setShowError] = useState<boolean>(false);
 
-  // Extract unique descriptions from existing expenses for autocomplete options
-  // Note: uniqueDescriptions removed since we're not using custom filter operators
-
-
-  // Note: DescriptionFilterInput removed since we're not using custom filter operators
-
-
-  // Note: Filter operators removed to fix quick filter functionality
-  // Custom filter operators were interfering with the quick filter
-
-  // Note: Date filter operators also removed to fix quick filter functionality
 
   // Open the confirmation dialog
   const handleOpenDialog = (id: number) => {
-    setSelectedExpenseId(id); // Store the ID of the expense to be deleted
-    setOpen(true); // Open the dialog
+    setSelectedExpenseId(id);
+    deleteDialog.open();
   };
 
   // Close the confirmation dialog
   const handleCloseDialog = () => {
-    setOpen(false); // Close the dialog
-    setSelectedExpenseId(null); // Clear the selected expense ID
+    deleteDialog.close();
+    setSelectedExpenseId(null);
   };
 
   // Confirm deletion
   const handleConfirmDelete = () => {
     if (selectedExpenseId !== null) {
-      deleteExpense(selectedExpenseId); // Delete the expense
+      deleteExpense(selectedExpenseId);
     }
-    handleCloseDialog(); // Close the dialog
+    handleCloseDialog();
   };
 
   // Open the edit dialog
@@ -87,19 +79,18 @@ const ExpenseList: React.FC = () => {
     setEditAmount(expense.amount.toString());
     setEditDate(expense.date);
     setEditCurrency(expense.currency);
-    setEditOpen(true);
+    editDialog.open();
   };
 
   // Close the edit dialog
   const handleCloseEditDialog = () => {
-    setEditOpen(false);
+    editDialog.close();
     setEditingExpense(null);
     setEditDescription("");
     setEditAmount("");
     setEditDate("");
     setEditCurrency("HUF");
-    setErrorMessage("");
-    setShowError(false);
+    errorHandler.clearError();
   };
 
   // Handle edit form submission
@@ -113,10 +104,9 @@ const ExpenseList: React.FC = () => {
       currency: editCurrency,
     };
 
-    const validation = validateEditForm(formData, validCurrencies);
+    const validation = validateEditForm(formData, [...validCurrencies]);
     if (!validation.isValid) {
-      setErrorMessage(validation.errorMessage || "Please fill in all fields.");
-      setShowError(true);
+      errorHandler.setError(validation.errorMessage || "Please fill in all fields.");
       return;
     }
 
@@ -127,13 +117,13 @@ const ExpenseList: React.FC = () => {
 
   // Define columns for the DataGrid
   const columns: GridColDef[] = [
-    { field: "description", headerName: "Description", flex: 2, minWidth: 200 },
-    { field: "amount", headerName: "Amount", type: "number", width: 120, align: "right", headerAlign: "right" },
-    { field: "currency", headerName: "Currency", width: 100 },
+    { field: "description", headerName: "Description", flex: 2, minWidth: COLUMN_WIDTHS.DESCRIPTION },
+    { field: "amount", headerName: "Amount", type: "number", width: COLUMN_WIDTHS.AMOUNT, align: "right", headerAlign: "right" },
+    { field: "currency", headerName: "Currency", width: COLUMN_WIDTHS.CURRENCY },
     {
       field: "date",
       headerName: "Date",
-      width: 120,
+      width: COLUMN_WIDTHS.DATE,
     },
     {
       field: "actions",
@@ -143,13 +133,13 @@ const ExpenseList: React.FC = () => {
       renderCell: (params) => (
         <ActionsCell row={params.row} onEdit={handleOpenEditDialog} onDelete={(id) => handleOpenDialog(id)} />
       ),
-      width: 100,
-      hideable: false, // Prevent hiding the actions column
+      width: COLUMN_WIDTHS.ACTIONS,
+      hideable: false,
     },
   ];
 
   return (
-    <div style={{ height: 380, marginTop: "1rem", width: "100%", overflow: "auto" }}>
+    <div style={{ height: DATA_GRID_HEIGHT, marginTop: "1rem", width: "100%", overflow: "auto" }}>
       <DataGrid
         rows={expenses}
         columns={columns}
@@ -171,35 +161,35 @@ const ExpenseList: React.FC = () => {
           },
         }}
         pageSizeOptions={[5, 10, 20]}
-        getRowId={(row) => row.id} // Use the `id` field as the unique identifier
+        getRowId={(row) => row.id}
         disableRowSelectionOnClick
         autoHeight={false}
         disableColumnMenu={false}
         disableColumnFilter={false}
         disableColumnSelector={false}
-        columnVisibilityModel={{}} // Ensure all columns are visible by default
+        columnVisibilityModel={{}}
         sx={{
           '& .MuiDataGrid-root': {
-            minWidth: '540px', // Total of all column widths (200+120+100+120+100)
+            minWidth: `${DATA_GRID_MIN_WIDTH}px`,
           },
           '& .MuiDataGrid-main': {
-            overflow: 'auto', // Allow horizontal scrolling when needed
+            overflow: 'auto',
           },
           '& .MuiDataGrid-virtualScroller': {
-            overflow: 'auto', // Ensure virtual scroller can handle overflow
+            overflow: 'auto',
           }
         }}
       />
 
       {/* Confirmation Dialog */}
-      <ConfirmDeleteDialog open={open} onClose={handleCloseDialog} onConfirm={handleConfirmDelete} />
+      <ConfirmDeleteDialog open={deleteDialog.isOpen} onClose={handleCloseDialog} onConfirm={handleConfirmDelete} />
 
       {/* Edit Dialog */}
       <EditExpenseDialog
-        open={editOpen}
+        open={editDialog.isOpen}
         onClose={handleCloseEditDialog}
         onSubmit={handleEditSubmit}
-        validCurrencies={validCurrencies}
+        validCurrencies={[...validCurrencies]}
         uniqueDescriptions={[]}
         editDescription={editDescription}
         setEditDescription={setEditDescription}
@@ -209,20 +199,20 @@ const ExpenseList: React.FC = () => {
         setEditDate={setEditDate}
         editCurrency={editCurrency}
         setEditCurrency={setEditCurrency}
-        showError={showError}
-        setShowError={setShowError}
-        errorMessage={errorMessage}
+        showError={errorHandler.showError}
+        setShowError={(open: boolean) => errorHandler.setError(open ? errorHandler.errorMessage : '')}
+        errorMessage={errorHandler.errorMessage}
       />
 
       {/* Error Snackbar */}
       <Snackbar
-        open={showError}
+        open={errorHandler.showError}
         autoHideDuration={6000}
-        onClose={() => setShowError(false)}
+        onClose={errorHandler.clearError}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert onClose={() => setShowError(false)} severity="error" sx={{ width: '100%' }}>
-          {errorMessage}
+        <Alert onClose={errorHandler.clearError} severity="error" sx={{ width: '100%' }}>
+          {errorHandler.errorMessage}
         </Alert>
       </Snackbar>
     </div>
