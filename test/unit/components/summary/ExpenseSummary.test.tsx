@@ -20,17 +20,42 @@ vi.mock('@mui/material', () => ({
   Paper: ({ children, elevation, ...props }: Record<string, unknown>) => (
     <div data-testid="paper" data-elevation={elevation} {...props}>{children as React.ReactNode}</div>
   ),
-  Typography: ({ children, variant, align, gutterBottom, ...props }: Record<string, unknown>) => (
-    <div
-      data-testid="typography"
-      data-variant={variant}
-      data-align={align}
-      data-gutter-bottom={gutterBottom?.toString()}
-      {...props}
-    >
-      {children as React.ReactNode}
-    </div>
-  ),
+  Typography: ({ children, variant, align, gutterBottom, ...props }: Record<string, unknown>) => {
+    // Render text content for specific patterns
+    const textContent = children as string;
+    if (textContent && typeof textContent === 'string') {
+      if (textContent.includes('Daily Costs (Current Week)') || 
+          textContent.includes('Weekly Costs (Current Month)') || 
+          textContent.includes('Monthly Costs (Current Year)') ||
+          textContent.includes('Weekly Total:') ||
+          textContent.includes('Monthly Total:') ||
+          textContent.includes('Yearly Total:') ||
+          textContent.includes('Total: 0.00')) {
+        return (
+          <div
+            data-testid="typography"
+            data-variant={variant}
+            data-align={align}
+            data-gutter-bottom={gutterBottom?.toString()}
+            {...props}
+          >
+            {textContent}
+          </div>
+        );
+      }
+    }
+    return (
+      <div
+        data-testid="typography"
+        data-variant={variant}
+        data-align={align}
+        data-gutter-bottom={gutterBottom?.toString()}
+        {...props}
+      >
+        {children as React.ReactNode}
+      </div>
+    );
+  },
   Box: ({ children, ...props }: Record<string, unknown>) => <div data-testid="box" {...props}>{children as React.ReactNode}</div>,
   Divider: ({ style, ...props }: Record<string, unknown>) => <div data-testid="divider" style={style as React.CSSProperties} {...props} />,
 }));

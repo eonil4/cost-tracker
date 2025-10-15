@@ -22,6 +22,8 @@ describe('ExpenseContext', () => {
     localStorageMock.setItem.mockClear();
     localStorageMock.removeItem.mockClear();
     localStorageMock.clear.mockClear();
+    // Reset localStorage mock to default implementation
+    localStorageMock.setItem.mockImplementation(() => {});
   });
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -457,7 +459,6 @@ describe('ExpenseContext', () => {
   describe('Error handling', () => {
     it('should handle localStorage save errors gracefully', () => {
       // Mock localStorage.setItem to throw an error
-      const originalSetItem = localStorageMock.setItem;
       localStorageMock.setItem.mockImplementation(() => {
         throw new Error('Storage quota exceeded');
       });
@@ -475,14 +476,13 @@ describe('ExpenseContext', () => {
       // This should not throw an error even if localStorage fails
       expect(() => {
         act(() => {
-          act(() => {
           result.current.addExpense(expense);
-        });
         });
       }).not.toThrow();
 
-      // Restore original implementation
-      localStorageMock.setItem = originalSetItem;
+      // The expense should still be added to the context even if localStorage fails
+      expect(result.current.expenses).toHaveLength(1);
+      expect(result.current.expenses[0]).toEqual(expense);
     });
 
     it('should handle invalid expense data in addExpense', () => {
