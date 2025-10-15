@@ -85,7 +85,7 @@ const CurrencySummaryGrid: React.FC = () => {
   }
 
   return (
-    <Box sx={{ mt: 4 }}>
+    <Box>
       <Typography variant="h5" gutterBottom align="center" sx={{ mb: 3 }}>
         Currency Breakdowns
       </Typography>

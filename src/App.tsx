@@ -21,7 +21,7 @@ const App: React.FC = () => {
           </Box>
         <Grid container spacing={3}>
           {/* Row 1: Form + List */}
-          <Grid size={12} sx={{ mb: { xs: 3, sm: 4, md: 5 } }}>
+          <Grid size={12}>
             <Grid container spacing={{ xs: 0, md: 3 }}>
               {/* Form Tile */}
               <Grid size={{ xs: 12, md: 4 }} sx={{ mb: { xs: 3, md: 0 } }}>
@@ -47,7 +47,7 @@ const App: React.FC = () => {
 
 
           {/* Row 2: Currency Summaries */}
-          <Grid size={12} sx={{ mt: { xs: 1, sm: 2 } }}>
+          <Grid size={12}>
             <CurrencySummaryGrid />
           </Grid>
         </Grid>
