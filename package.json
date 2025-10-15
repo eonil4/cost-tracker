@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "ci": "pnpm run lint && pnpm run build && pnpm run test:unit:run",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",

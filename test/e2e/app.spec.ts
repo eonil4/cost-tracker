@@ -263,9 +263,9 @@ test.describe('Cost Tracker Application', () => {
     await expect(page.getByText('Test Expense 2')).toBeVisible();
     
     // Check that summary sections are visible and contain data
-    await expect(page.getByText(/Daily Costs - Week of/)).toBeVisible();
-    await expect(page.getByText(/Weekly Costs -/)).toBeVisible();
-    await expect(page.getByText(/Monthly Costs -/)).toBeVisible();
+    await expect(page.getByText(/Daily Costs - Week of/).first()).toBeVisible();
+    await expect(page.getByText(/Weekly Costs -/).first()).toBeVisible();
+    await expect(page.getByText(/Monthly Costs -/).first()).toBeVisible();
     
     // Check for chart elements (SVG elements from recharts)
     // Look for recharts SVG elements specifically - use first() to avoid strict mode violation
