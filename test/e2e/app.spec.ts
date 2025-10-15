@@ -25,10 +25,16 @@ test.describe('Cost Tracker Application', () => {
     // Check list section
     await expect(page.getByRole('heading', { name: 'Expenses' })).toBeVisible();
     
-    // Check summary section - these are the actual titles from SummaryGrid
-    await expect(page.getByText(/Daily Costs - Week of/)).toBeVisible();
-    await expect(page.getByText(/Weekly Costs -/)).toBeVisible();
-    await expect(page.getByText(/Monthly Costs -/)).toBeVisible();
+    // Add an expense to make the summary section visible
+    await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense');
+    await page.getByRole('spinbutton', { name: 'Amount' }).fill('100');
+    await page.getByRole('textbox', { name: 'Date' }).fill('2024-01-15');
+    await page.locator('[data-testid="currency-select"]').click();
+    await page.getByRole('option', { name: 'HUF' }).click();
+    await page.getByRole('button', { name: 'Add Expense' }).click();
+    
+    // Check summary section - these are the actual titles from CurrencySummaryGrid
+    await expect(page.getByText('Currency Breakdowns')).toBeVisible();
   });
 
   test('should add a new expense', async ({ page }) => {
@@ -86,9 +92,12 @@ test.describe('Cost Tracker Application', () => {
     await expect(page.getByText('Original Expense')).toBeVisible();
     
     // Find the edit button - use a more specific selector to avoid click interception
-    const editButton = page.locator('[role="gridcell"] button[type="button"]').first();
+    const editButton = page.locator('[data-testid="edit-button"]').first();
     
-    await editButton.waitFor({ state: 'visible', timeout: 15000 });
+    // Wait for the button to be visible and enabled
+    await editButton.waitFor({ state: 'visible', timeout: 10000 });
+    await editButton.waitFor({ state: 'attached', timeout: 5000 });
+    
     // Use force click to avoid interception issues on mobile
     await editButton.click({ force: true });
     
@@ -130,8 +139,9 @@ test.describe('Cost Tracker Application', () => {
     // Wait for the expense to be added and grid to render
     await expect(page.getByText('Expense to Delete')).toBeVisible();
     
-    const deleteButton = page.locator('[role="gridcell"] button').nth(1); // Second button in a grid cell (delete)
+    const deleteButton = page.locator('[data-testid="delete-button"]').first();
     await deleteButton.waitFor({ state: 'visible', timeout: 10000 });
+    await deleteButton.waitFor({ state: 'attached', timeout: 5000 });
     await deleteButton.click({ force: true }); // Use force click to avoid interception issues on mobile
     
     // Confirm deletion - use force click to avoid interception issues on mobile

@@ -171,12 +171,25 @@ const ExpenseList: React.FC = () => {
         sx={{
           '& .MuiDataGrid-root': {
             minWidth: `${DATA_GRID_MIN_WIDTH}px`,
+            height: `${DATA_GRID_HEIGHT}px`,
           },
           '& .MuiDataGrid-main': {
-            overflow: 'auto',
+            overflow: 'hidden',
           },
           '& .MuiDataGrid-virtualScroller': {
-            overflow: 'auto',
+            overflow: 'hidden',
+          },
+          '& .MuiDataGrid-row': {
+            height: '52px !important',
+          },
+          '& .MuiDataGrid-columnHeaders': {
+            height: '56px !important',
+          },
+          '& .MuiDataGrid-toolbarContainer': {
+            height: '56px !important',
+          },
+          '& .MuiDataGrid-footerContainer': {
+            height: '52px !important',
           }
         }}
       />
