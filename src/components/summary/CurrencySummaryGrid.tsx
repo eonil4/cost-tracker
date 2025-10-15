@@ -97,7 +97,7 @@ const CurrencySummaryGrid: React.FC = () => {
           <Grid container spacing={{ xs: 0, md: 3 }}>
             {/* Daily Costs */}
             <Grid size={{ xs: 12, md: 4 }} sx={{ mb: { xs: 3, md: 0 } }}>
-              <Paper elevation={3} sx={{ padding: 3, height: 500, display: 'flex', flexDirection: 'column' }}>
+              <Paper elevation={3} sx={{ padding: 3, height: 452, display: 'flex', flexDirection: 'column' }}>
                 <TimePeriodSelector
                   title={`Daily Costs - Week of ${format(selectedWeek, 'MMM dd, yyyy')}`}
                   currentValue={selectedWeek.toISOString()}
@@ -113,7 +113,7 @@ const CurrencySummaryGrid: React.FC = () => {
 
             {/* Weekly Costs */}
             <Grid size={{ xs: 12, md: 4 }} sx={{ mb: { xs: 3, md: 0 } }}>
-              <Paper elevation={3} sx={{ padding: 3, height: 500, display: 'flex', flexDirection: 'column' }}>
+              <Paper elevation={3} sx={{ padding: 3, height: 452, display: 'flex', flexDirection: 'column' }}>
                 <TimePeriodSelector
                   title={`Weekly Costs - ${format(selectedMonth, 'MMMM yyyy')}`}
                   currentValue={selectedMonth.toISOString()}
@@ -129,7 +129,7 @@ const CurrencySummaryGrid: React.FC = () => {
 
             {/* Monthly Costs */}
             <Grid size={{ xs: 12, md: 4 }} sx={{ mb: { xs: 3, md: 0 } }}>
-              <Paper elevation={3} sx={{ padding: 3, height: 500, display: 'flex', flexDirection: 'column' }}>
+              <Paper elevation={3} sx={{ padding: 3, height: 452, display: 'flex', flexDirection: 'column' }}>
                 <TimePeriodSelector
                   title={`Monthly Costs - ${selectedYear}`}
                   currentValue={new Date(selectedYear, 0, 1).toISOString()}

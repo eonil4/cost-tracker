@@ -149,7 +149,7 @@ const ExpenseList: React.FC = () => {
   ];
 
   return (
-    <div style={{ height: 400, marginTop: "2rem", width: "100%", overflow: "auto" }}>
+    <div style={{ height: 380, marginTop: "1rem", width: "100%", overflow: "auto" }}>
       <DataGrid
         rows={expenses}
         columns={columns}
