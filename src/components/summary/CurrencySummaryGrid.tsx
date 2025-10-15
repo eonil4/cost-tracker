@@ -16,6 +16,7 @@ import {
   calculateMonthlyCostsByCurrencyForYear,
   getUniqueCurrencies
 } from "../../utils/calculationUtils";
+import { CURRENCY_ORDER } from "../../constants/currencies";
 
 const CurrencySummaryGrid: React.FC = () => {
   const context = useContext(ExpenseContext);
@@ -29,8 +30,9 @@ const CurrencySummaryGrid: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
   const data = useMemo(() => {
-    // Get all unique currencies
-    const currencies = getUniqueCurrencies(expenses);
+    // Get all unique currencies and sort them according to the form dropdown order
+    const uniqueCurrencies = getUniqueCurrencies(expenses);
+    const currencies = CURRENCY_ORDER.filter(currency => uniqueCurrencies.includes(currency));
     
     // Calculate data for each currency
     const currencyData = currencies.map(currency => {

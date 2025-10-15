@@ -13,6 +13,7 @@ import {
   Snackbar,
 } from "@mui/material";
 import { handleAutocompleteChange, renderAutocompleteInput } from "../../utils/autocompleteUtils";
+import { CURRENCY_ORDER } from "../../constants/currencies";
 
 const ExpenseForm: React.FC = () => {
   const context = useContext(ExpenseContext);
@@ -30,7 +31,7 @@ const ExpenseForm: React.FC = () => {
   };
 
   // Valid currencies
-  const validCurrencies = useMemo(() => ["HUF", "USD", "EUR", "GBP"], []);
+  const validCurrencies = useMemo(() => CURRENCY_ORDER, []);
 
   // Form state
   const [description, setDescription] = useState<string>(""); // State for description
