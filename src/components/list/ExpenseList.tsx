@@ -127,14 +127,13 @@ const ExpenseList: React.FC = () => {
 
   // Define columns for the DataGrid
   const columns: GridColDef[] = [
-    { field: "description", headerName: "Description", flex: 1, minWidth: 280 },
-    { field: "amount", headerName: "Amount", type: "number", width: 140, align: "right", headerAlign: "right" },
-    { field: "currency", headerName: "Currency", flex: 1 },
+    { field: "description", headerName: "Description", flex: 2, minWidth: 200 },
+    { field: "amount", headerName: "Amount", type: "number", width: 120, align: "right", headerAlign: "right" },
+    { field: "currency", headerName: "Currency", width: 100 },
     {
       field: "date",
       headerName: "Date",
-      flex: 1,
-      minWidth: 160,
+      width: 120,
     },
     {
       field: "actions",
@@ -144,14 +143,13 @@ const ExpenseList: React.FC = () => {
       renderCell: (params) => (
         <ActionsCell row={params.row} onEdit={handleOpenEditDialog} onDelete={(id) => handleOpenDialog(id)} />
       ),
-      flex: 0.8,
-      minWidth: 120, // Ensure actions column has minimum width
+      width: 100,
       hideable: false, // Prevent hiding the actions column
     },
   ];
 
   return (
-    <div style={{ height: 400, marginTop: "2rem", width: "100%", minWidth: "800px" }}>
+    <div style={{ height: 400, marginTop: "2rem", width: "100%", overflow: "auto" }}>
       <DataGrid
         rows={expenses}
         columns={columns}
@@ -182,7 +180,13 @@ const ExpenseList: React.FC = () => {
         columnVisibilityModel={{}} // Ensure all columns are visible by default
         sx={{
           '& .MuiDataGrid-root': {
-            minWidth: '800px', // Force minimum width to prevent column hiding
+            minWidth: '540px', // Total of all column widths (200+120+100+120+100)
+          },
+          '& .MuiDataGrid-main': {
+            overflow: 'auto', // Allow horizontal scrolling when needed
+          },
+          '& .MuiDataGrid-virtualScroller': {
+            overflow: 'auto', // Ensure virtual scroller can handle overflow
           }
         }}
       />
