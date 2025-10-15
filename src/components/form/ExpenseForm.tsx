@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { handleAutocompleteChange, renderAutocompleteInput } from "../../utils/autocompleteUtils";
 import { CURRENCY_ORDER } from "../../constants/currencies";
+import type { ValidCurrency } from "../../constants/currencies";
 
 const ExpenseForm: React.FC = () => {
   const context = useContext(ExpenseContext);
@@ -63,7 +64,7 @@ const ExpenseForm: React.FC = () => {
     }
 
     // Validate currency
-    if (!validCurrencies.includes(currency)) {
+    if (!CURRENCY_ORDER.includes(currency as ValidCurrency)) {
       setErrorMessage("Please select a valid currency.");
       setShowError(true);
       return;
@@ -93,7 +94,7 @@ const ExpenseForm: React.FC = () => {
     setAmount("");
     setDate(getTodayDate()); // Reset date to today
     setCurrency("HUF");
-  }, [description, amount, date, currency, validCurrencies, addExpense, generateUniqueId]);
+  }, [description, amount, date, currency, addExpense, generateUniqueId]);
 
   // Extract unique descriptions from previous expenses
   const uniqueDescriptions = useMemo(() => 

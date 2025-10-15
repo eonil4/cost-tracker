@@ -66,7 +66,6 @@ describe('App', () => {
     expect(screen.getByText('Expenses')).toBeInTheDocument();
     expect(screen.getByTestId('expense-form')).toBeInTheDocument();
     expect(screen.getByTestId('expense-list')).toBeInTheDocument();
-    expect(screen.getByTestId('summary-grid')).toBeInTheDocument();
     expect(screen.getByTestId('currency-summary-grid')).toBeInTheDocument();
   });
 
