@@ -139,7 +139,7 @@ const ExpenseList: React.FC = () => {
   ];
 
   return (
-    <div style={{ height: DATA_GRID_HEIGHT, marginTop: "1rem", width: "100%", overflow: "auto" }}>
+    <div style={{ height: DATA_GRID_HEIGHT, width: "100%", overflow: "auto" }}>
       <DataGrid
         rows={expenses}
         columns={columns}
@@ -174,10 +174,10 @@ const ExpenseList: React.FC = () => {
             height: `${DATA_GRID_HEIGHT}px`,
           },
           '& .MuiDataGrid-main': {
-            overflow: 'hidden',
+            overflow: 'auto',
           },
           '& .MuiDataGrid-virtualScroller': {
-            overflow: 'hidden',
+            overflow: 'auto',
           },
           '& .MuiDataGrid-row': {
             height: '52px !important',
