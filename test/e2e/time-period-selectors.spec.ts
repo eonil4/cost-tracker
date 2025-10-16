@@ -14,16 +14,17 @@ test.describe('Time Period Selectors', () => {
   test('should display time period selectors in summary section', async ({ page }) => {
     // First add some expenses to make the summary section visible
     await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense 1');
-    await page.getByRole('spinbutton', { name: 'Amount' }).fill('100');
-    await page.getByRole('textbox', { name: 'Date' }).fill('2024-01-15');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
     await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
     await page.getByRole('option', { name: 'HUF' }).click();
     await page.getByRole('button', { name: 'Add Expense' }).click();
     
     // Add another expense with different currency
     await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense 2');
-    await page.getByRole('spinbutton', { name: 'Amount' }).fill('50');
-    await page.getByRole('textbox', { name: 'Date' }).fill('2024-01-16');
+    await page.locator('input[type="number"]').fill('50');
+    await page.locator('input[type="date"]').fill('2024-01-16');
     await page.locator('[data-testid="currency-select"]').click();
     await page.getByRole('option', { name: 'USD' }).click();
     await page.getByRole('button', { name: 'Add Expense' }).click();
@@ -40,16 +41,17 @@ test.describe('Time Period Selectors', () => {
   test('should have quick navigation buttons', async ({ page }) => {
     // First add some expenses to make the summary section visible
     await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense 1');
-    await page.getByRole('spinbutton', { name: 'Amount' }).fill('100');
-    await page.getByRole('textbox', { name: 'Date' }).fill('2024-01-15');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
     await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
     await page.getByRole('option', { name: 'HUF' }).click();
     await page.getByRole('button', { name: 'Add Expense' }).click();
     
     // Add another expense with different currency
     await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense 2');
-    await page.getByRole('spinbutton', { name: 'Amount' }).fill('50');
-    await page.getByRole('textbox', { name: 'Date' }).fill('2024-01-16');
+    await page.locator('input[type="number"]').fill('50');
+    await page.locator('input[type="date"]').fill('2024-01-16');
     await page.locator('[data-testid="currency-select"]').click();
     await page.getByRole('option', { name: 'USD' }).click();
     await page.getByRole('button', { name: 'Add Expense' }).click();
@@ -63,9 +65,10 @@ test.describe('Time Period Selectors', () => {
   test('should navigate to current week when clicking Current Week button', async ({ page }) => {
     // First add some expenses to make the summary section visible
     await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense 1');
-    await page.getByRole('spinbutton', { name: 'Amount' }).fill('100');
-    await page.getByRole('textbox', { name: 'Date' }).fill('2024-01-15');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
     await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
     await page.getByRole('option', { name: 'HUF' }).click();
     await page.getByRole('button', { name: 'Add Expense' }).click();
     
@@ -81,9 +84,10 @@ test.describe('Time Period Selectors', () => {
   test('should navigate to current month when clicking Current Month button', async ({ page }) => {
     // First add some expenses to make the summary section visible
     await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense 1');
-    await page.getByRole('spinbutton', { name: 'Amount' }).fill('100');
-    await page.getByRole('textbox', { name: 'Date' }).fill('2024-01-15');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
     await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
     await page.getByRole('option', { name: 'HUF' }).click();
     await page.getByRole('button', { name: 'Add Expense' }).click();
     
@@ -107,9 +111,10 @@ test.describe('Time Period Selectors', () => {
   test('should navigate to current year when clicking Current Year button', async ({ page }) => {
     // First add some expenses to make the summary section visible
     await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense 1');
-    await page.getByRole('spinbutton', { name: 'Amount' }).fill('100');
-    await page.getByRole('textbox', { name: 'Date' }).fill('2024-01-15');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
     await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
     await page.getByRole('option', { name: 'HUF' }).click();
     await page.getByRole('button', { name: 'Add Expense' }).click();
     

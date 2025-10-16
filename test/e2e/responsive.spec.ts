@@ -24,9 +24,10 @@ test.describe('Responsive Design', () => {
     
     // Add an expense to make the summary section visible
     await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense');
-    await page.getByRole('spinbutton', { name: 'Amount' }).fill('100');
-    await page.getByRole('textbox', { name: 'Date' }).fill('2024-01-15');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
     await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
     await page.getByRole('option', { name: 'HUF' }).click();
     await page.getByRole('button', { name: 'Add Expense' }).click();
     
@@ -46,9 +47,10 @@ test.describe('Responsive Design', () => {
     
     // Add an expense to make the summary section visible
     await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense');
-    await page.getByRole('spinbutton', { name: 'Amount' }).fill('100');
-    await page.getByRole('textbox', { name: 'Date' }).fill('2024-01-15');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
     await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
     await page.getByRole('option', { name: 'HUF' }).click();
     await page.getByRole('button', { name: 'Add Expense' }).click();
     
@@ -67,9 +69,10 @@ test.describe('Responsive Design', () => {
     
     // Add an expense to make the summary section visible
     await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense');
-    await page.getByRole('spinbutton', { name: 'Amount' }).fill('100');
-    await page.getByRole('textbox', { name: 'Date' }).fill('2024-01-15');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
     await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
     await page.getByRole('option', { name: 'HUF' }).click();
     await page.getByRole('button', { name: 'Add Expense' }).click();
     

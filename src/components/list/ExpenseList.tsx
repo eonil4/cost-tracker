@@ -135,6 +135,7 @@ const ExpenseList: React.FC = () => {
       ),
       width: COLUMN_WIDTHS.ACTIONS,
       hideable: false,
+      disableColumnMenu: true,
     },
   ];
 
@@ -167,7 +168,6 @@ const ExpenseList: React.FC = () => {
         disableColumnMenu={false}
         disableColumnFilter={false}
         disableColumnSelector={false}
-        columnVisibilityModel={{}}
         sx={{
           '& .MuiDataGrid-root': {
             minWidth: `${DATA_GRID_MIN_WIDTH}px`,

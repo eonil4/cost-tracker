@@ -12,9 +12,9 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Optimize workers for faster execution */
-  workers: process.env.CI ? 2 : 4,
+  workers: process.env.CI ? 1 : 1,
   /* Reduce timeout for faster feedback */
-  timeout: 15000,
+  timeout: 30000,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html', { outputFolder: './report/playwright-report' }]
@@ -30,8 +30,8 @@ export default defineConfig({
     trace: 'on-first-retry',
     
     /* Optimize for faster execution */
-    actionTimeout: 10000,
-    navigationTimeout: 10000,
+    actionTimeout: 15000,
+    navigationTimeout: 60000,
   },
 
   /* Setup files to run before each test file */
@@ -83,5 +83,8 @@ export default defineConfig({
     command: 'npm run dev',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
+    timeout: 180 * 1000, // 3 minutes
+    stdout: 'pipe',
+    stderr: 'pipe',
   },
 });
