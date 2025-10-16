@@ -10,10 +10,20 @@ interface ActionsCellProps<T = Record<string, unknown>> {
 const ActionsCell = <T extends { id: number }>({ row, onEdit, onDelete }: ActionsCellProps<T>) => {
   return (
     <Box display="flex" gap={1}>
-      <IconButton color="primary" onClick={() => onEdit(row)} size="small">
+      <IconButton 
+        color="primary" 
+        onClick={() => onEdit(row)} 
+        size="small"
+        data-testid="edit-button"
+      >
         <FaEdit />
       </IconButton>
-      <IconButton color="error" onClick={() => onDelete(row.id)} size="small">
+      <IconButton 
+        color="error" 
+        onClick={() => onDelete(row.id)} 
+        size="small"
+        data-testid="delete-button"
+      >
         <FaTrash />
       </IconButton>
     </Box>

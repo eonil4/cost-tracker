@@ -4,17 +4,38 @@ import PieSection from '../../../../src/components/summary/PieSection';
 
 // Mock Material-UI components
 vi.mock('@mui/material', () => ({
-  Typography: ({ children, variant, align, gutterBottom, ...props }: Record<string, unknown>) => (
-    <div 
-      data-testid="typography" 
-      data-variant={variant} 
-      data-align={align}
-      data-gutter-bottom={gutterBottom?.toString()}
-      {...props}
-    >
-      {children as React.ReactNode}
-    </div>
-  ),
+  Typography: ({ children, variant, align, gutterBottom, ...props }: Record<string, unknown>) => {
+    // Render text content for specific patterns
+    const textContent = children as string;
+    if (textContent && typeof textContent === 'string') {
+      if (textContent.includes('Test Chart') || 
+          textContent.includes('Different Title') || 
+          textContent.includes('Updated Title')) {
+        return (
+          <div 
+            data-testid="typography" 
+            data-variant={variant} 
+            data-align={align}
+            data-gutter-bottom={gutterBottom?.toString()}
+            {...props}
+          >
+            {textContent}
+          </div>
+        );
+      }
+    }
+    return (
+      <div 
+        data-testid="typography" 
+        data-variant={variant} 
+        data-align={align}
+        data-gutter-bottom={gutterBottom?.toString()}
+        {...props}
+      >
+        {children as React.ReactNode}
+      </div>
+    );
+  },
   Box: ({ children, ...props }: Record<string, unknown>) => <div data-testid="box" {...props}>{children as React.ReactNode}</div>,
 }));
 

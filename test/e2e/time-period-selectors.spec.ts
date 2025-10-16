@@ -12,22 +12,68 @@ test.describe('Time Period Selectors', () => {
   });
 
   test('should display time period selectors in summary section', async ({ page }) => {
-    // Check that all three time period selectors are visible
-    await expect(page.getByText(/Daily Costs - Week of/)).toBeVisible();
-    await expect(page.getByText(/Weekly Costs -/)).toBeVisible();
-    await expect(page.getByText(/Monthly Costs -/)).toBeVisible();
+    // First add some expenses to make the summary section visible
+    await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense 1');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
+    await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
+    await page.getByRole('option', { name: 'HUF' }).click();
+    await page.getByRole('button', { name: 'Add Expense' }).click();
+    
+    // Add another expense with different currency
+    await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense 2');
+    await page.locator('input[type="number"]').fill('50');
+    await page.locator('input[type="date"]').fill('2024-01-16');
+    await page.locator('[data-testid="currency-select"]').click();
+    await page.getByRole('option', { name: 'USD' }).click();
+    await page.getByRole('button', { name: 'Add Expense' }).click();
+    
+    // Check that Currency Breakdowns section is visible
+    await expect(page.getByText('Currency Breakdowns')).toBeVisible();
+    
+    // Check that time period selectors are visible (they should appear for each currency)
+    await expect(page.getByText(/Daily Costs - Week of/).first()).toBeVisible();
+    await expect(page.getByText(/Weekly Costs -/).first()).toBeVisible();
+    await expect(page.getByText(/Monthly Costs -/).first()).toBeVisible();
   });
 
   test('should have quick navigation buttons', async ({ page }) => {
+    // First add some expenses to make the summary section visible
+    await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense 1');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
+    await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
+    await page.getByRole('option', { name: 'HUF' }).click();
+    await page.getByRole('button', { name: 'Add Expense' }).click();
+    
+    // Add another expense with different currency
+    await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense 2');
+    await page.locator('input[type="number"]').fill('50');
+    await page.locator('input[type="date"]').fill('2024-01-16');
+    await page.locator('[data-testid="currency-select"]').click();
+    await page.getByRole('option', { name: 'USD' }).click();
+    await page.getByRole('button', { name: 'Add Expense' }).click();
+    
     // Check for quick navigation buttons
-    await expect(page.getByRole('button', { name: 'Current Week' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Current Month' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Current Year' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Current Week' }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Current Month' }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Current Year' }).first()).toBeVisible();
   });
 
   test('should navigate to current week when clicking Current Week button', async ({ page }) => {
+    // First add some expenses to make the summary section visible
+    await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense 1');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
+    await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
+    await page.getByRole('option', { name: 'HUF' }).click();
+    await page.getByRole('button', { name: 'Add Expense' }).click();
+    
     // Click the Current Week button - use force click to avoid interception issues on mobile
-    await page.getByRole('button', { name: 'Current Week' }).click({ force: true });
+    await page.getByRole('button', { name: 'Current Week' }).first().click({ force: true });
     
     // Verify the date picker shows current week
     // This test assumes the date picker updates its value
@@ -36,8 +82,17 @@ test.describe('Time Period Selectors', () => {
   });
 
   test('should navigate to current month when clicking Current Month button', async ({ page }) => {
+    // First add some expenses to make the summary section visible
+    await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense 1');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
+    await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
+    await page.getByRole('option', { name: 'HUF' }).click();
+    await page.getByRole('button', { name: 'Add Expense' }).click();
+    
     // Click the Current Month button - use force click to avoid interception issues on mobile
-    await page.getByRole('button', { name: 'Current Month' }).click({ force: true });
+    await page.getByRole('button', { name: 'Current Month' }).first().click({ force: true });
     
     // Verify the month picker shows current month
     // MUI DatePicker renders as text input, not month input
@@ -54,8 +109,17 @@ test.describe('Time Period Selectors', () => {
   });
 
   test('should navigate to current year when clicking Current Year button', async ({ page }) => {
+    // First add some expenses to make the summary section visible
+    await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense 1');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
+    await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
+    await page.getByRole('option', { name: 'HUF' }).click();
+    await page.getByRole('button', { name: 'Add Expense' }).click();
+    
     // Click the Current Year button - use force click to avoid interception issues on mobile
-    await page.getByRole('button', { name: 'Current Year' }).click({ force: true });
+    await page.getByRole('button', { name: 'Current Year' }).first().click({ force: true });
     
     // Verify the year picker shows current year
     const yearPicker = page.locator('input[type="number"]').first();

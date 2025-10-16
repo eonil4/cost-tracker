@@ -19,7 +19,19 @@ vi.mock('@mui/material', () => ({
       {children as React.ReactNode}
     </button>
   ),
-  Typography: ({ children, ...props }: Record<string, unknown>) => <div data-testid="typography" {...props}>{children as React.ReactNode}</div>,
+  Typography: ({ children, ...props }: Record<string, unknown>) => {
+    // Render text content for specific patterns
+    const textContent = children as string;
+    if (textContent && typeof textContent === 'string') {
+      if (textContent.includes('Confirm Deletion') || 
+          textContent.includes('Are you sure you want to delete this expense?') ||
+          textContent.includes('Cancel') ||
+          textContent.includes('Delete')) {
+        return <div data-testid="typography" {...props}>{textContent}</div>;
+      }
+    }
+    return <div data-testid="typography" {...props}>{children as React.ReactNode}</div>;
+  },
 }));
 
 describe('ConfirmDeleteDialog', () => {

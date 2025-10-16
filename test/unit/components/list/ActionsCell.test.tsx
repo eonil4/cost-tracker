@@ -60,8 +60,8 @@ describe('ActionsCell', () => {
       />
     );
 
-    expect(screen.getByTestId('icon-button-primary')).toBeInTheDocument();
-    expect(screen.getByTestId('icon-button-error')).toBeInTheDocument();
+    expect(screen.getByTestId('edit-button')).toBeInTheDocument();
+    expect(screen.getByTestId('delete-button')).toBeInTheDocument();
     expect(screen.getByTestId('edit-icon')).toBeInTheDocument();
     expect(screen.getByTestId('trash-icon')).toBeInTheDocument();
   });
@@ -75,7 +75,7 @@ describe('ActionsCell', () => {
       />
     );
 
-    const editButton = screen.getByTestId('icon-button-primary');
+    const editButton = screen.getByTestId('edit-button');
     fireEvent.click(editButton);
 
     expect(mockOnEdit).toHaveBeenCalledTimes(1);
@@ -91,7 +91,7 @@ describe('ActionsCell', () => {
       />
     );
 
-    const deleteButton = screen.getByTestId('icon-button-error');
+    const deleteButton = screen.getByTestId('delete-button');
     fireEvent.click(deleteButton);
 
     expect(mockOnDelete).toHaveBeenCalledTimes(1);
@@ -107,8 +107,8 @@ describe('ActionsCell', () => {
       />
     );
 
-    const editButton = screen.getByTestId('icon-button-primary');
-    const deleteButton = screen.getByTestId('icon-button-error');
+    const editButton = screen.getByTestId('edit-button');
+    const deleteButton = screen.getByTestId('delete-button');
 
     expect(editButton).toHaveAttribute('data-size', 'small');
     expect(deleteButton).toHaveAttribute('data-size', 'small');
@@ -123,8 +123,8 @@ describe('ActionsCell', () => {
       />
     );
 
-    expect(screen.getByTestId('icon-button-primary')).toBeInTheDocument();
-    expect(screen.getByTestId('icon-button-error')).toBeInTheDocument();
+    expect(screen.getByTestId('edit-button')).toBeInTheDocument();
+    expect(screen.getByTestId('delete-button')).toBeInTheDocument();
   });
 
   it('should work with different row types', () => {
@@ -142,8 +142,8 @@ describe('ActionsCell', () => {
       />
     );
 
-    const editButton = screen.getByTestId('icon-button-primary');
-    const deleteButton = screen.getByTestId('icon-button-error');
+    const editButton = screen.getByTestId('edit-button');
+    const deleteButton = screen.getByTestId('delete-button');
 
     fireEvent.click(editButton);
     fireEvent.click(deleteButton);
@@ -161,8 +161,8 @@ describe('ActionsCell', () => {
       />
     );
 
-    const editButton = screen.getByTestId('icon-button-primary');
-    const deleteButton = screen.getByTestId('icon-button-error');
+    const editButton = screen.getByTestId('edit-button');
+    const deleteButton = screen.getByTestId('delete-button');
 
     // Click edit button multiple times
     fireEvent.click(editButton);

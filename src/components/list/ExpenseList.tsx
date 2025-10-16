@@ -135,11 +135,12 @@ const ExpenseList: React.FC = () => {
       ),
       width: COLUMN_WIDTHS.ACTIONS,
       hideable: false,
+      disableColumnMenu: true,
     },
   ];
 
   return (
-    <div style={{ height: DATA_GRID_HEIGHT, marginTop: "1rem", width: "100%", overflow: "auto" }}>
+    <div style={{ height: DATA_GRID_HEIGHT, width: "100%", overflow: "auto" }}>
       <DataGrid
         rows={expenses}
         columns={columns}
@@ -167,16 +168,28 @@ const ExpenseList: React.FC = () => {
         disableColumnMenu={false}
         disableColumnFilter={false}
         disableColumnSelector={false}
-        columnVisibilityModel={{}}
         sx={{
           '& .MuiDataGrid-root': {
             minWidth: `${DATA_GRID_MIN_WIDTH}px`,
+            height: `${DATA_GRID_HEIGHT}px`,
           },
           '& .MuiDataGrid-main': {
             overflow: 'auto',
           },
           '& .MuiDataGrid-virtualScroller': {
             overflow: 'auto',
+          },
+          '& .MuiDataGrid-row': {
+            height: '52px !important',
+          },
+          '& .MuiDataGrid-columnHeaders': {
+            height: '56px !important',
+          },
+          '& .MuiDataGrid-toolbarContainer': {
+            height: '56px !important',
+          },
+          '& .MuiDataGrid-footerContainer': {
+            height: '52px !important',
           }
         }}
       />

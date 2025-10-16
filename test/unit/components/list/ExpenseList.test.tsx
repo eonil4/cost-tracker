@@ -307,7 +307,7 @@ describe('ExpenseList', () => {
     await screen.findByTestId('row-1');
     
     // Click edit button
-    const editButton = screen.getByTestId('icon-button-primary');
+    const editButton = screen.getByTestId('edit-button');
     await user.click(editButton);
     
     // Verify edit dialog is open
@@ -336,7 +336,7 @@ describe('ExpenseList', () => {
     await screen.findByTestId('row-1');
     
     // Click edit button
-    const editButton = screen.getByTestId('icon-button-primary');
+    const editButton = screen.getByTestId('edit-button');
     await user.click(editButton);
     
     // Verify edit dialog is open
@@ -361,8 +361,8 @@ describe('ExpenseList', () => {
     renderWithProvider(<ExpenseList />);
     
     // Verify actions cell is rendered
-    expect(screen.getByTestId('icon-button-primary')).toBeInTheDocument();
-    expect(screen.getByTestId('icon-button-error')).toBeInTheDocument();
+    expect(screen.getByTestId('edit-button')).toBeInTheDocument();
+    expect(screen.getByTestId('delete-button')).toBeInTheDocument();
   });
 
   it('should handle currency filter component', () => {
@@ -518,7 +518,7 @@ describe('ExpenseList', () => {
     await screen.findByTestId('row-1');
     
     // Click edit button
-    const editButton = screen.getByTestId('icon-button-primary');
+    const editButton = screen.getByTestId('edit-button');
     await user.click(editButton);
     
     // Verify edit dialog is open
@@ -545,7 +545,7 @@ describe('ExpenseList', () => {
     await screen.findByTestId('row-1');
     
     // Click edit button
-    const editButton = screen.getByTestId('icon-button-primary');
+    const editButton = screen.getByTestId('edit-button');
     await user.click(editButton);
     
     // Verify edit dialog is open
@@ -572,7 +572,7 @@ describe('ExpenseList', () => {
     await screen.findByTestId('row-1');
     
     // Click edit button
-    const editButton = screen.getByTestId('icon-button-primary');
+    const editButton = screen.getByTestId('edit-button');
     await user.click(editButton);
     
     // Verify edit dialog is open
@@ -599,7 +599,7 @@ describe('ExpenseList', () => {
     await screen.findByTestId('row-1');
     
     // Click edit button
-    const editButton = screen.getByTestId('icon-button-primary');
+    const editButton = screen.getByTestId('edit-button');
     await user.click(editButton);
     
     // Verify edit dialog is open
@@ -626,7 +626,7 @@ describe('ExpenseList', () => {
     await screen.findByTestId('row-1');
     
     // Click delete button
-    const deleteButton = screen.getByTestId('icon-button-error');
+    const deleteButton = screen.getByTestId('delete-button');
     await user.click(deleteButton);
     
     // Verify delete dialog is open
@@ -646,7 +646,7 @@ describe('ExpenseList', () => {
     await screen.findByTestId('row-1');
     
     // Click delete button
-    const deleteButton = screen.getByTestId('icon-button-error');
+    const deleteButton = screen.getByTestId('delete-button');
     await user.click(deleteButton);
     
     // Verify delete dialog is open
@@ -670,7 +670,7 @@ describe('ExpenseList', () => {
     await screen.findByTestId('row-1');
     
     // Click delete button
-    const deleteButton = screen.getByTestId('icon-button-error');
+    const deleteButton = screen.getByTestId('delete-button');
     await user.click(deleteButton);
     
     // Verify delete dialog is open
@@ -697,7 +697,7 @@ describe('ExpenseList', () => {
     await screen.findByTestId('row-1');
     
     // Click edit button
-    const editButton = screen.getByTestId('icon-button-primary');
+    const editButton = screen.getByTestId('edit-button');
     await user.click(editButton);
     
     // Verify edit dialog is open
