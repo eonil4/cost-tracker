@@ -51,17 +51,39 @@ vi.mock('@mui/material', () => ({
       {children as React.ReactNode}
     </div>
   ),
-  Typography: ({ children, variant, align, gutterBottom, ...props }: Record<string, unknown>) => (
-    <div
-      data-testid="typography"
-      data-variant={variant}
-      data-align={align}
-      data-gutter-bottom={gutterBottom}
-      {...props}
-    >
-      {children as React.ReactNode}
-    </div>
-  ),
+  Typography: ({ children, variant, align, gutterBottom, ...props }: Record<string, unknown>) => {
+    // Render text content for specific patterns
+    const textContent = children as string;
+    if (textContent && typeof textContent === 'string') {
+      if (textContent.includes('Test Title') || 
+          textContent.includes('Current Week') || 
+          textContent.includes('Current Month') ||
+          textContent.includes('Current Year')) {
+        return (
+          <div
+            data-testid="typography"
+            data-variant={variant}
+            data-align={align}
+            data-gutter-bottom={gutterBottom}
+            {...props}
+          >
+            {textContent}
+          </div>
+        );
+      }
+    }
+    return (
+      <div
+        data-testid="typography"
+        data-variant={variant}
+        data-align={align}
+        data-gutter-bottom={gutterBottom}
+        {...props}
+      >
+        {children as React.ReactNode}
+      </div>
+    );
+  },
   Button: ({ children, onClick, disabled, ...props }: Record<string, unknown>) => (
     <button
       data-testid="button"

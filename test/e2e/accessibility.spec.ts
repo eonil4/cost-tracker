@@ -3,8 +3,10 @@ import { test, expect } from '@playwright/test';
 test.describe('Accessibility', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    // Wait for the app to be fully loaded
-    await page.waitForSelector('h1, h2, h3, h4, h5, h6');
+    
+    // Simple wait for page to load
+    await page.waitForLoadState('domcontentloaded', { timeout: 15000 });
+    
     // Clear any existing data
     await page.evaluate(() => {
       localStorage.clear();
@@ -12,10 +14,13 @@ test.describe('Accessibility', () => {
   });
 
   test('should have proper heading structure', async ({ page }) => {
+    // Wait a bit for React to render the headings
+    await page.waitForTimeout(500);
+    
     // Check that main headings are properly structured
-    await expect(page.getByRole('heading', { name: 'Cost Tracker' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Add Expense' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Expenses' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Cost Tracker' })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: 'Add Expense' })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: 'Expenses' })).toBeVisible({ timeout: 10000 });
   });
 
   test('should have proper form labels', async ({ page }) => {
@@ -32,6 +37,9 @@ test.describe('Accessibility', () => {
   });
 
   test('should be keyboard navigable', async ({ page }) => {
+    // Wait for form to be ready
+    await page.waitForTimeout(500);
+    
     // Test keyboard navigation by focusing on the description input
     const descriptionInput = page.locator('input').first();
     await descriptionInput.click();

@@ -27,17 +27,41 @@ vi.mock('@mui/material', () => ({
   Paper: ({ children, elevation, ...props }: Record<string, unknown>) => (
     <div data-testid="paper" data-elevation={elevation} {...props}>{children as React.ReactNode}</div>
   ),
-  Typography: ({ children, variant, align, gutterBottom, ...props }: Record<string, unknown>) => (
-    <div
-      data-testid="typography"
-      data-variant={variant}
-      data-align={align}
-      data-gutter-bottom={gutterBottom}
-      {...props}
-    >
-      {children as React.ReactNode}
-    </div>
-  ),
+  Typography: ({ children, variant, align, gutterBottom, ...props }: Record<string, unknown>) => {
+    // Render text content for specific patterns
+    const textContent = children as string;
+    if (textContent && typeof textContent === 'string') {
+      if (textContent.includes('Daily Costs - Week of') || 
+          textContent.includes('Weekly Costs -') || 
+          textContent.includes('Monthly Costs -') ||
+          textContent.includes('Weekly Total:') ||
+          textContent.includes('Monthly Total:') ||
+          textContent.includes('Yearly Total:')) {
+        return (
+          <div
+            data-testid="typography"
+            data-variant={variant}
+            data-align={align}
+            data-gutter-bottom={gutterBottom}
+            {...props}
+          >
+            {textContent}
+          </div>
+        );
+      }
+    }
+    return (
+      <div
+        data-testid="typography"
+        data-variant={variant}
+        data-align={align}
+        data-gutter-bottom={gutterBottom}
+        {...props}
+      >
+        {children as React.ReactNode}
+      </div>
+    );
+  },
   Grid: ({ children, container, spacing, size, ...props }: Record<string, unknown>) => (
     <div
       data-testid="grid"

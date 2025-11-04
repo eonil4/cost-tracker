@@ -97,6 +97,7 @@ const ExpenseForm: React.FC = () => {
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
             label="Currency"
+            data-testid="currency-select"
           >
             {validCurrencies.map((curr) => (
               <MenuItem key={curr} value={curr}>

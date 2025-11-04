@@ -22,8 +22,17 @@ test.describe('Responsive Design', () => {
     // Check that expenses list is visible
     await expect(page.getByRole('heading', { name: 'Expenses' })).toBeVisible();
     
+    // Add an expense to make the summary section visible
+    await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
+    await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
+    await page.getByRole('option', { name: 'HUF' }).click();
+    await page.getByRole('button', { name: 'Add Expense' }).click();
+    
     // Check that summary section is visible
-    await expect(page.getByText(/Daily Costs - Week of/)).toBeVisible();
+    await expect(page.getByText('Currency Breakdowns')).toBeVisible();
   });
 
   test('should display correctly on tablet devices', async ({ page }) => {
@@ -35,7 +44,17 @@ test.describe('Responsive Design', () => {
     await expect(page.getByRole('heading', { name: 'Cost Tracker' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Add Expense' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Expenses' })).toBeVisible();
-    await expect(page.getByText(/Daily Costs - Week of/)).toBeVisible();
+    
+    // Add an expense to make the summary section visible
+    await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
+    await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
+    await page.getByRole('option', { name: 'HUF' }).click();
+    await page.getByRole('button', { name: 'Add Expense' }).click();
+    
+    await expect(page.getByText('Currency Breakdowns')).toBeVisible();
   });
 
   test('should display correctly on desktop', async ({ page }) => {
@@ -47,7 +66,17 @@ test.describe('Responsive Design', () => {
     await expect(page.getByRole('heading', { name: 'Cost Tracker' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Add Expense' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Expenses' })).toBeVisible();
-    await expect(page.getByText(/Daily Costs - Week of/)).toBeVisible();
+    
+    // Add an expense to make the summary section visible
+    await page.getByRole('combobox', { name: 'Description' }).fill('Test Expense');
+    await page.locator('input[type="number"]').fill('100');
+    await page.locator('input[type="date"]').fill('2024-01-15');
+    await page.locator('[data-testid="currency-select"]').click();
+    await page.waitForTimeout(100); // Wait for dropdown to stabilize
+    await page.getByRole('option', { name: 'HUF' }).click();
+    await page.getByRole('button', { name: 'Add Expense' }).click();
+    
+    await expect(page.getByText('Currency Breakdowns')).toBeVisible();
   });
 
   test('should handle form interaction on mobile', async ({ page }) => {

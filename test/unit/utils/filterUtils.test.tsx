@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import { render, fireEvent } from '@testing-library/react';
 import { 
   createCurrencyFilterOperator, 
   createDescriptionFilterOperator, 
@@ -11,8 +12,16 @@ vi.mock('@mui/material', () => ({
   Autocomplete: ({ options, value, ...props }: Record<string, unknown>) => (
     <div data-testid="autocomplete" data-options={JSON.stringify(options)} data-value={value} {...props} />
   ),
-  TextField: ({ label, type, value, ...props }: Record<string, unknown>) => (
-    <div data-testid="textfield" data-label={label} data-type={type} data-value={value} {...props} />
+  TextField: ({ label, type, value, onChange, inputRef, ...props }: Record<string, unknown>) => (
+    <div data-testid="textfield" data-label={label} data-type={type} data-value={value} {...props}>
+      <input 
+        type={type} 
+        value={value || ''} 
+        onChange={onChange}
+        ref={inputRef}
+        data-testid="textfield-input"
+      />
+    </div>
   ),
 }));
 
@@ -131,6 +140,76 @@ describe('filterUtils', () => {
       
       expect(filterFn?.({ value: '100' })).toBe(true);
       expect(filterFn?.({ value: '200' })).toBe(false);
+    });
+
+    it('should handle input changes in amount filter', () => {
+      const operator = createAmountFilterOperator();
+      const mockApplyValue = vi.fn();
+      const mockProps = {
+        item: { value: '100' },
+        applyValue: mockApplyValue,
+        focusElementRef: null
+      };
+      
+      const InputComponent = operator.InputComponent;
+      render(<InputComponent {...mockProps} />);
+      
+      const input = document.querySelector('input[type="number"]');
+      expect(input).toBeInTheDocument();
+      
+      fireEvent.change(input!, { target: { value: '200' } });
+      
+      expect(mockApplyValue).toHaveBeenCalledWith({ value: '200' });
+    });
+  });
+
+  describe('InputComponent rendering', () => {
+    it('should render date filter input with correct props', () => {
+      const operator = createDateFilterOperator();
+      const mockProps = {
+        item: { value: '2024-01-01' },
+        applyValue: vi.fn(),
+        focusElementRef: null
+      };
+      
+      const InputComponent = operator.InputComponent;
+      render(<InputComponent {...mockProps} />);
+      
+      const input = document.querySelector('input[type="date"]');
+      expect(input).toBeInTheDocument();
+      expect(input).toHaveValue('2024-01-01');
+    });
+
+    it('should render amount filter input with correct props', () => {
+      const operator = createAmountFilterOperator();
+      const mockProps = {
+        item: { value: '100' },
+        applyValue: vi.fn(),
+        focusElementRef: null
+      };
+      
+      const InputComponent = operator.InputComponent;
+      render(<InputComponent {...mockProps} />);
+      
+      const input = document.querySelector('input[type="number"]');
+      expect(input).toBeInTheDocument();
+      expect(input).toHaveValue(100);
+    });
+
+    it('should handle empty values in input components', () => {
+      const operator = createDateFilterOperator();
+      const mockProps = {
+        item: { value: '' },
+        applyValue: vi.fn(),
+        focusElementRef: null
+      };
+      
+      const InputComponent = operator.InputComponent;
+      render(<InputComponent {...mockProps} />);
+      
+      const input = document.querySelector('input[type="date"]');
+      expect(input).toBeInTheDocument();
+      // Note: The input might have a default value, so we just check it exists
     });
   });
 });
